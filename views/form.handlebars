@@ -15,8 +15,8 @@
     <img src="./images/bookmark.png" alt="Logo Left" height="125px">
     </a>
   </div>
-  <div class="title-description">
-    <h1 class="title">Carthage College Civic Connect</h1>
+  <div class="title-description" style="overflow: hidden">
+    <h1 class="title" style="overflow: hidden">Carthage College Civic Connect</h1>
     <p class="description">Fill out the form below to submit a project proposal</p>
   </div>
   <div class="logout-right" >
@@ -26,7 +26,7 @@
 <!--Future me, think I want to change header to have a gradient on the bottom
 fading from the pic to white to better transition from the header to the form-->
 <body>
-<form action="/project" method="post" enctype="application/x-www-form-urlencoded" style="margin-bottom: 5%;">
+<form action="/project" method="post" enctype="application/x-www-form-urlencoded" style="margin-bottom: 5%; overflow: hidden">
     <div class="row" style="margin-left:5%" >
         <div class="col2">
             <label for="fname" class="label-style">First Name*</label>
@@ -198,12 +198,11 @@ fading from the pic to white to better transition from the header to the form-->
             </div>
           </select>
       </div>
-      <div>
-        <br><br><br>
-        <input type="submit" value="Submit" tabindex="17">
-      </div>
+      
     </div>  
-
+  <div>
+    <input style="margin-left: 10%;" type="submit" value="Submit" tabindex="17">
+  </div>
 </form>
 </body>
 
