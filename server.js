@@ -16,11 +16,11 @@ var emailAddresses= [/*1*/"adassow@carthage.edu", /*2*/"nscharnick@carthage.edu"
   /*14*/"cpalmer5@carthage.edu", /*15*/"rmatthews@carthage.edu"]
 
 // user is the email that is controlling the account of which all automated emails will be sent from.
-var USER = 'afischer1@carthage.edu'; //  fig23_civic_engagement@carthage.edu is an available email to be used for the account.
+var USER = 'ewojciechowski@carthage.edu'; //  fig23_civic_engagement@carthage.edu is an available email to be used for the account.
 
 // to generate the password for the account go to myaccount.google.com >> Security >> 2-Step Verification (account must have 2-Step verification enabled.)
 // then open App Passwords at the bottom of the page and name the application. copy the generated password and past in the space below.
-var PASS = 'csrl lbqr uape wlkk'; 
+var PASS = 'vdnf vheb bwxz tbgm'; 
  
 
 /*####################################################################################################################################
@@ -157,7 +157,7 @@ async function mailer(bodyParser) {
       from: '"Civic Connect mailer" <' + USER + '>', // sender address change to the account sending the emails
 
       //  Switch the commented and uncommented lines below when ready to launch or change the to emails for testing. 
-      to: 'afischer1@carthage.edu, austinf0912@gmail.com', // list of receivers
+      to: 'ewojciechowski@carthage.edu', // list of receivers
       // to: emails,
 
       // email subject line can be changed here.
