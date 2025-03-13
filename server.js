@@ -74,12 +74,12 @@ app.use(session({
 
 // Configure Passport.js
 passport.use(new OneLoginStrategy({
-    issuer: process.env.OIDC_BASE_URI + '/oidc/2',
-    clientID: process.env.OIDC_CLIENT_ID,
-    clientSecret: process.env.OIDC_CLIENT_SECRET,
-    authorizationURL: process.env.OIDC_BASE_URI + '/oidc/2/auth',
-    userInfoURL: process.env.OIDC_BASE_URI + '/oidc/2/me',
-    tokenURL: process.env.OIDC_BASE_URI + '/oidc/2/token',
+    issuer: process.env.OIDC_BASE_URI,
+    clientID: process.env.OIDC_CLIENT_ID,    
+    clientSecret: process.env.OIDC_CLIENT_SECRET,    
+    authorizationURL: process.env.OIDC_BASE_URI + '/auth',
+    userInfoURL: process.env.OIDC_BASE_URI + '/me',
+    tokenURL : process.env.OIDC_BASE_URI + '/token',
     callbackURL: process.env.OIDC_REDIRECT_URI,
     passReqToCallback: true
   }, (req, issuer, userId, profile, accessToken, refreshToken, params, cb) => {
@@ -89,6 +89,8 @@ passport.use(new OneLoginStrategy({
     return cb(null, profile);
   }));
   
+
+
   passport.serializeUser((user, done) => done(null, user));
   passport.deserializeUser((obj, done) => done(null, obj));
   
