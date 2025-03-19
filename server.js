@@ -329,7 +329,7 @@ app.get('/faculty/company', ensureAuthenticated, async (req, res) => {
  res.json({"results": "error"});
 }
 
-//First draft of a get function for generating and populating the left-hand table in faculty.html. still unsure of how to call this function from the html file itself, or if im supposed to be doing that in the first place
+//Function to sort table by date in when date href clicked on /faculty
 });
 
 app.get('/faculty/date', ensureAuthenticated, async (req, res) => {
@@ -356,7 +356,7 @@ if(allProjects) {
  res.json({"results": "error"});
 }
 
-//First draft of a get function for generating and populating the left-hand table in faculty.html. still unsure of how to call this function from the html file itself, or if im supposed to be doing that in the first place
+//Function to sort table by status when status href clicked on /faculty
 });
 
 app.get('/faculty/status', ensureAuthenticated, async (req, res) => {
@@ -383,7 +383,7 @@ app.get('/faculty/status', ensureAuthenticated, async (req, res) => {
  res.json({"results": "error"});
 }
 
-//First draft of a get function for generating and populating the left-hand table in faculty.html. still unsure of how to call this function from the html file itself, or if im supposed to be doing that in the first place
+//Function to sort table by department when department href clicked on /faculty
 });
 
 app.get('/faculty/department', ensureAuthenticated, async (req, res) => {
@@ -410,7 +410,7 @@ app.get('/faculty/department', ensureAuthenticated, async (req, res) => {
  res.json({"results": "error"});
 }
 
-//First draft of a get function for generating and populating the left-hand table in faculty.html. still unsure of how to call this function from the html file itself, or if im supposed to be doing that in the first place
+//Function to display all information when id href clicked in /faculty
 });
 
 app.get('/allinformation/:projectid', ensureAuthenticated, async (req, res) => {
