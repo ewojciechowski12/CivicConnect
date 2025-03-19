@@ -48,7 +48,6 @@
 }
 
 /* Title and Description Container */
-/* Title and Description Container */
 .title-description {
   margin-right: 0%;
   text-align: center;
@@ -190,7 +189,7 @@ input:hover[type=submit] {
     font-size: 16px;
     padding: 10px 20px 12px 45px;
     border: none;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;   
 }
 
 #myInput:focus {outline: 3px solid #ddd;}
@@ -391,10 +390,21 @@ table, th, td {
   border-collapse: collapse;
   font-family: Helvetica, sans-serif;
   padding: 5px;
-
 }
 tr{
   border: 1px solid black;
+}
+.state.selected{
+  color: rgb(238, 42, 55); /* Change link color to blue when hovered */
+  /*text-decoration: underline; /* Add an underline when hovered */
+}
+th a, th{
+  color:#888;
+  text-decoration: none;
+}
+th a:hover {
+  color: rgb(238, 42, 55); /* Change link color to blue when hovered */
+  text-decoration: underline; /* Add an underline when hovered */
 }
 
 table {width: 100%;
@@ -403,7 +413,7 @@ text-align: left;
 
 .noVisual {
   text-decoration: none;
-  color: black;
+  color: #888;
 }
 
 .test-dropdown {

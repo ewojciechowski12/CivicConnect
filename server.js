@@ -57,7 +57,6 @@ var sortDate = false;
 var sortStat = false;
 var sortDep = true;
 
-
 app.use(cors());
 app.engine('handlebars', handlebars.engine); 
 app.set('view engine', 'handlebars');
@@ -89,8 +88,6 @@ passport.use(new OneLoginStrategy({
     req.session.idToken = params['id_token'];
     return cb(null, profile);
   }));
-  
-
 
   passport.serializeUser((user, done) => done(null, user));
   passport.deserializeUser((obj, done) => done(null, obj));
@@ -281,9 +278,18 @@ app.get('/faculty', ensureAuthenticated, async (req, res) => {
 	 
    try {
 	    const allProjects = await db.getAllProjectsReverseSortByDate();
-        sortDate = true;
+
+      //Code to display count next to th on /faculty
+      const allCount = allProjects.length;
+      const completeCount = allProjects.filter(p => p.pstatus === 'Complete').length;
+      const incompleteCount = allProjects.filter(p => p.pstatus === 'Incomplete').length;
+      const waitingCount = allProjects.filter(p => p.pstatus === 'Waiting').length;
+
+      sortDate = true;
+
 	    if(allProjects) {
-        	res.render('leftHandTable', {projects: allProjects});
+        	res.render('leftHandTable', {allCount,completeCount,incompleteCount,waitingCount,projects: allProjects});
+          
 	    } else {
         	res.json({"results": "none"});
 	    }
@@ -365,8 +371,7 @@ app.get('/faculty/status', ensureAuthenticated, async (req, res) => {
   try {    
 
     var allProjects;
-    const status = req.query.status;
-    
+    const status = req.query.status;    
 
     if(!status){
       if(sortStat){
@@ -383,9 +388,22 @@ app.get('/faculty/status', ensureAuthenticated, async (req, res) => {
     } else {      
       allProjects = await db.getProjectByStatus(status);      
     }  
+
+    //Code to display count next to th on /faculty
+    const allCount = allProjects.length;    
+    const completeCount = allProjects.filter(p => p.pstatus === 'Complete').length;
+    const incompleteCount = allProjects.filter(p => p.pstatus === 'Incomplete').length;
+    const waitingCount = allProjects.filter(p => p.pstatus === 'Waiting').length;
     
     if(allProjects && allProjects.length > 0) {
-        res.render('leftHandTable', {projects: allProjects});
+      res.render('leftHandTable', {
+        projects: allProjects, 
+        currentStatus: status,
+        allCount,
+        completeCount,
+        incompleteCount,
+        waitingCount
+      });
     } else {
         res.json({"results": "none"});
     }
