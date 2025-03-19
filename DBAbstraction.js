@@ -741,5 +741,28 @@ deleteUnusedCompany()
         	});
     	});
 	}
+	
+	getProjectByStatus(status)
+	{
+		const sql = `
+			SELECT Company.name, Company.first, Company.last, Project.Description, Project.Date, Project.pstatus, Department.depName, Project.projectID
+        FROM Project
+        JOIN Company ON Project.CompanyID = Company.companyID
+        JOIN ProjectDepartment ON Project.projectID = ProjectDepartment.projectID
+        JOIN Department ON ProjectDepartment.departmentID = Department.departmentID
+        WHERE Project.pstatus = ?
+        `; 
+		
+		return new Promise((resolve, reject) => {
+        	this.db.all(sql, [status], (err, row) => {
+            	if(err) {					
+                	reject(err);
+            	} else {
+                	resolve(row);
+            	}
+        	});
+    	});
+	}
+
 }
 module.exports = DBAbstraction;

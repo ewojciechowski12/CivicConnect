@@ -57,6 +57,7 @@ var sortDate = false;
 var sortStat = false;
 var sortDep = true;
 
+
 app.use(cors());
 app.engine('handlebars', handlebars.engine); 
 app.set('view engine', 'handlebars');
@@ -361,26 +362,35 @@ if(allProjects) {
 
 app.get('/faculty/status', ensureAuthenticated, async (req, res) => {
 	 
-  try {
+  try {    
+
     var allProjects;
-    if(sortStat){
-        allProjects = await db.getAllProjectsReverseSortByStatus();
-        sortStat = false;
+    const status = req.query.status;
+    
+
+    if(!status){
+      if(sortStat){
+          allProjects = await db.getAllProjectsReverseSortByStatus();
+          sortStat = false;
+      }
+      else{
+          allProjects = await db.getAllProjectsSortByStatus();
+          sortComp = false;
+          sortDate = false;
+          sortStat = true;
+          sortDep = false;
+      }
+    } else {      
+      allProjects = await db.getProjectByStatus(status);      
+    }  
+    
+    if(allProjects && allProjects.length > 0) {
+        res.render('leftHandTable', {projects: allProjects});
+    } else {
+        res.json({"results": "none"});
     }
-    else{
-        allProjects = await db.getAllProjectsSortByStatus();
-        sortComp = false;
-        sortDate = false;
-        sortStat = true;
-        sortDep = false;
-    }
- if(allProjects) {
-     res.render('leftHandTable', {projects: allProjects});
- } else {
-     res.json({"results": "none"});
- }
-} catch (err) {
- res.json({"results": "error"});
+  } catch (err) {    
+  res.json({"results": "error"});
 }
 
 //Function to sort table by department when department href clicked on /faculty

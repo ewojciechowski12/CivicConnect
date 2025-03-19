@@ -6,13 +6,22 @@
 
 <table class="table-striped table-hover table-interactive" overflow-y="hidden" > 
     <thead> 
-        <th width="5%"><a href="/faculty/date" tabindex="1" class="noVisual">Project ID</a></th>
-        <th width="8%"><a href="/faculty/company" tabindex="1" class="noVisual">Company</a></th>
-        <th width="7%">Contact</th>
-        <th width="40%">Description</th>
-        <th width="10%"><a href="/faculty/date" tabindex="1" class="noVisual">Submission Date</a></th>
-        <th width="10%"><a href="/faculty/status" tabindex="1" class="noVisual">Status</a></th>
-        <th width="20%"><a href="/faculty/department" tabindex="1" class="noVisual">Department</a></th>
+        <tr>
+            <th><a href="/faculty">All</a></th>
+            <th><a href="/faculty/status?status=Complete">Complete</a></th>
+            <th><a href="/faculty/status?status=Incomplete">Incomplete</a></th>
+            <th><a href="/faculty/status?status=Waiting">Waiting</a></th>
+            <th>Archived</th>
+        </tr>
+        <tr>
+            <th width="5%"><a href="/faculty/date" tabindex="1" class="noVisual">Project ID</a></th>
+            <th width="8%"><a href="/faculty/company" tabindex="1" class="noVisual">Company</a></th>
+            <th width="7%">Contact</th>
+            <th width="40%">Description</th>
+            <th width="10%"><a href="/faculty/date" tabindex="1" class="noVisual">Submission Date</a></th>
+            <th width="10%"><a href="/faculty/status" tabindex="1" class="noVisual">Status</a></th>
+            <th width="20%"><a href="/faculty/department" tabindex="1" class="noVisual">Department</a></th>
+        </tr>
     </thead> 
  
  <!-- Table For all Projects on /faculty -->

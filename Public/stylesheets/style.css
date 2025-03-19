@@ -387,12 +387,14 @@ height: 20px;
   max-width: 0;
 }
 
-table, th, td {
-  border: 1px solid black;
+table, th, td {  
   border-collapse: collapse;
   font-family: Helvetica, sans-serif;
   padding: 5px;
 
+}
+tr{
+  border: 1px solid black;
 }
 
 table {width: 100%;
