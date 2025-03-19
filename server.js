@@ -411,9 +411,9 @@ app.get('/faculty/status', ensureAuthenticated, async (req, res) => {
   res.json({"results": "error"});
 }
 
-//Function to sort table by department when department href clicked on /faculty
 });
 
+//Function to sort table by department when department href clicked on /faculty
 app.get('/faculty/department', ensureAuthenticated, async (req, res) => {
 	 
   try {
@@ -437,10 +437,9 @@ app.get('/faculty/department', ensureAuthenticated, async (req, res) => {
 } catch (err) {
  res.json({"results": "error"});
 }
-
-//Function to display all information when id href clicked in /faculty
 });
 
+//Function to display all information when id href clicked in /faculty
 app.get('/allinformation/:projectid', ensureAuthenticated, async (req, res) => {
 	try {
         
@@ -454,9 +453,9 @@ app.get('/allinformation/:projectid', ensureAuthenticated, async (req, res) => {
     	res.json({"results": "error"});
 	}
 
-  //first draft of a get function for generating a table on the right-hand side of faculty.html with all the information about a project based on what project you clicked from the left-hand table
+  
 });
-
+//first draft of a get function for generating a table on the right-hand side of faculty.html with all the information about a project based on what project you clicked from the left-hand table
 app.get('/allinformation/statusupdate/:projectid', ensureAuthenticated, async (req, res) => {
   try {
 	await db.updateProjectStatus(Number(req.params.projectid));
