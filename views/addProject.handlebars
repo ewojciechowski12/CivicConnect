@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <meta charset="utf-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
+  <link rel="stylesheet" href="/stylesheets/style.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <title>Carthage Civic Connect</title>
+  <link rel="icon" type="image/x-icon" href="/images/bookflame.png">
+
+  <style>    
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f7f8;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 40px;
+      font-size: 2.5rem;
+      color: #333;
+    }
+
+    form {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    label {
+      font-weight: bold;
+      margin-bottom: 10px;
+      display: inline-block;
+      font-size: 2rem;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 2rem;
+    }
+
+    input[type="text"], input[type="email"], select {
+      background-color: #f9f9f9;
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    button {
+      background-color: rgb(238, 42, 55);
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 2rem;
+      width: 100%;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: rgb(169, 36, 45);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    select {
+      background-color: lightgrey;
+    }
+
+    /* Customizing the dropdown button for select */
+    .dropdown-toggle {
+      background-color: lightgrey;
+      color: black;
+    }
+    
+  </style>
+</head>
+
+<body>
+
+  <h1>Add Old/Already Existing Project</h1>
+
+  <nav>
+    <a href="/faculty">All Projects</a>
+  </nav>
+
+  <form action="/project" method="POST">
+    <div class="form-group">
+      <label for="fname">First Name:</label>
+      <input type="text" id="fname" name="fname" required>
+    </div>
+
+    <div class="form-group">
+      <label for="lname">Last Name:</label>
+      <input type="text" id="lname" name="lname" required>
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required>
+    </div>
+
+    <div class="form-group">
+      <label for="OrgName">Organization Name:</label>
+      <input type="text" id="OrgName" name="OrgName" required>
+    </div>
+
+    <div class="form-group">
+      <label for="Description">Project Description:</label>
+      <textarea id="Description" name="Description" required></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="streetAddr">Company Street Address:</label>
+      <textarea id="streetAddr" name="streetAddr" required></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="cityTown">Company City/Town:</label>
+      <textarea id="cityTown" name="cityTown" required></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="state">Company State:</label>
+      <select id="state" name="state" class="dropdown-toggle" required>
+        <option selected hidden>State*</option>
+        <option value="alabama">Alabama</option>
+        <option value="alaska">Alaska</option>
+        <option value="arizona">Arizona</option>
+        <option value="arkansas">Arkansas</option>
+        <option value="california">California</option>
+        <option value="colorado">Colorado</option>
+        <option value="connecticut">Connecticut</option>
+        <option value="delaware">Delaware</option>
+        <option value="florida">Florida</option>
+        <option value="georgia">Georgia</option>
+        <option value="hawaii">Hawaii</option>
+        <option value="idaho">Idaho</option>
+        <option value="illinois">Illinois</option>
+        <option value="indiana">Indiana</option>
+        <option value="iowa">Iowa</option>
+        <option value="kansas">Kansas</option>
+        <option value="kentucky">Kentucky</option>
+        <option value="louisiana">Louisiana</option>
+        <option value="maine">Maine</option>
+        <option value="maryland">Maryland</option>
+        <option value="massachusetts">Massachusetts</option>
+        <option value="michigan">Michigan</option>
+        <option value="minnesota">Minnesota</option>
+        <option value="mississippi">Mississippi</option>
+        <option value="missouri">Missouri</option>
+        <option value="montana">Montana</option>
+        <option value="nebraska">Nebraska</option>
+        <option value="nevada">Nevada</option>
+        <option value="new-hampshire">New Hampshire</option>
+        <option value="new-jersey">New Jersey</option>
+        <option value="new-mexico">New Mexico</option>
+        <option value="new-york">New York</option>
+        <option value="north-carolina">North Carolina</option>
+        <option value="north-dakota">North Dakota</option>
+        <option value="ohio">Ohio</option>
+        <option value="oklahoma">Oklahoma</option>
+        <option value="oregon">Oregon</option>
+        <option value="pennsylvania">Pennsylvania</option>
+        <option value="rhode-island">Rhode Island</option>
+        <option value="south-carolina">South Carolina</option>
+        <option value="south-dakota">South Dakota</option>
+        <option value="tennessee">Tennessee</option>
+        <option value="texas">Texas</option>
+        <option value="utah">Utah</option>
+        <option value="vermont">Vermont</option>
+        <option value="virginia">Virginia</option>
+        <option value="washington">Washington</option>
+        <option value="west-virginia">West Virginia</option>
+        <option value="wisconsin">Wisconsin</option>
+        <option value="wyoming">Wyoming</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="zip">Company Zipcode:</label>
+      <textarea id="zip" name="zip" required></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="pStatus">Project Status:</label>
+      <textarea id="pStatus" name="pStatus" required></textarea>
+    </div>
+
+    <div class="form-group">
+        <label for="department" class="label-style">Select department(s)* (CTRL click to select multiple):</label>
+          <select name="department" id="department" class="test-dropdown-select" tabindex="16" multiple required>      
+              <option class="test-dropdown-option" value="1">Biology</option>
+              <option class="test-dropdown-option" value="2">Carthage Honors Program</option>
+              <option class="test-dropdown-option" value="3">Clinical/Counseling Psychology</option>
+              <option class="test-dropdown-option" value="4">Computer Science</option>
+              <option class="test-dropdown-option" value="5">Engineering</option>
+              <option class="test-dropdown-option" value="6">Environmental Science</option>
+              <option class="test-dropdown-option" value="7">GIS, mapping, spatial analytics</option>
+              <option class="test-dropdown-option" value="8">Geoscience</option>
+              <option class="test-dropdown-option" value="9">Graphic Design and Photography</option>
+              <option class="test-dropdown-option" value="10">Healthcare pre-professions-Allied Health Science</option>
+              <option class="test-dropdown-option" value="11">History</option>
+              <option class="test-dropdown-option" value="12">Operations Management, Strategic Planning, Human Capital, and Start-Ups</option>
+              <option class="test-dropdown-option" value="14">Public Relation (press releases, social media calendars, feature articles, event plans)</option>
+              <option class="test-dropdown-option" value="15">Sociology & Criminal Justice</option>
+              <option class="test-dropdown-option" value="13">Other</option>
+      </select>
+    </div>
+
+    <button type="submit">Add Project</button>
+  </form>
+
+  <!-- Bootstrap 3.3.7 JS and dependencies -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</body>
+</html>

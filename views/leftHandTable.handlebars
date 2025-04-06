@@ -16,13 +16,21 @@
                     </tr>
             </table>
         </div>
+
+        <!--Button to Add Project Manually (navigates to addProject.handlebars) -->            
+        <div>
+            <button type="button"  class="btn" onclick="location.href='/addProject'">
+                <i class="fas fa-plus"></i> Add Project
+            </button>
+        </div>
+
         <!-- Search Bar -->
         <div class="search-container">
             <input type="text" id="Search" name="Search" class="length1"  tabindex="1">
             <button type="submit" tabindex="2">
                 <i class="fas fa-search"></i>
             </button>
-        </div>
+        </div>        
     </div>
 </form>
 
@@ -85,5 +93,5 @@
                 state.classList.add('selected');
             });
         });
-    });
+    });   
 </script>

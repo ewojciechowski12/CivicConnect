@@ -513,6 +513,64 @@ app.get('/allinformation/deleteDep/:projectid/:depName', ensureAuthenticated, as
       res.status(500).send('Internal Server Error'); // Respond with an appropriate error message
   }
 });
+
+// Page for faculty to manually add project
+app.get('/addProject', ensureAuthenticated, (req, res) => {
+  res.render('addProject'); 
+});
+
+// Push project to database from /addProject
+app.post('/addProject', async (req, res) => {
+  const {
+    fname,
+    lname,
+    email,
+    cityTown,    
+    state,    
+    OrgName,    
+    streetAddr,
+    zip,    
+    Description,
+    department,
+    pStatus,
+    pNumber,
+    OrgSite
+  } = req.body;
+
+  try {
+    // Insert new company or find existing one
+    await db.insertCompany(OrgName, streetAddr, cityTown, state, zip, fname, lname, pNumber, email, OrgSite);
+    const companyID = await db.getCompanyID(OrgName, fname, lname);
+
+    if (!companyID) {
+      return res.status(400).json({ result: 'Failed to find or make company' });
+    }
+
+    // Get current date/time
+    const currentDate = new Date();
+    const dateTime = `${currentDate.getFullYear()} / ${currentDate.getMonth() + 1} / ${currentDate.getDate()} @ ${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}`;
+
+    // Insert new project
+    await db.insertProject(Description, "Waiting", Comp, radio, helpAvail, companyID, dateTime, pStatus);
+    const projectID = await db.getProjectID(Description);
+
+    if (!projectID) {
+      return res.status(400).json({ result: 'Failed to find or make Project' });
+    }
+
+    // Associate departments
+    for (let i = 0; i < department.length; i++) {
+      await db.insertProjectDepartment(department[i], projectID);
+    }
+
+    res.json({ result: 'Project successfully submitted' });
+  } catch (error) {
+    console.error('Error in /addProject:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
  
 app.use((req, res) => {
 	res.status(404).send(`<h2>Uh Oh!</h2><p>Sorry ${req.url} cannot be found here</p>`);
