@@ -119,10 +119,12 @@ passport.use(new OneLoginStrategy({
 
 function addresses(ids){
   var email = "";
-  for (var i = 0; i < ids.length; i++) {
-    email += emailAddresses[ids[i] - 1];
-    if(i < ids.length - 1){
-      email+=  ", ";
+  if(ids && ids.length > 0){
+    for (var i = 0; i < ids.length; i++) {
+      email += emailAddresses[ids[i] - 1];
+      if(i < ids.length - 1){
+        email+=  ", ";
+      }
     }
   }
   return email;
@@ -156,7 +158,7 @@ async function mailer(bodyParser) {
       rejectUnauthorized:false
     }
   });
-  var emails = addresses(bodyParser.multipleDrop);
+  var emails = addresses(bodyParser.department);
 
   // setup email data with unicode symbols
   let mailOptions = {
@@ -251,7 +253,7 @@ app.post('/project', async (req, res) => {
     const zip = req.body.zip;
     const helpAvail = req.body.helpAvail;
     const Description = req.body.Description;
-    const depart = req.body.multipleDrop;
+    const depart = req.body.department;
   
     try {
       await db.insertCompany(OrgName, streetAddr, cityTown, state, zip, fName, lName, pNumber, email, OrgSite);
@@ -292,7 +294,7 @@ app.get('/faculty', ensureAuthenticated, async (req, res) => {
    try {
 	    const allProjects = await db.getAllProjectsReverseSortByDate();
 
-      //Code to display count next to th on /faculty
+      //Code to display count next to tableheaders on /faculty
       const allCount = allProjects.length;
       const completeCount = allProjects.filter(p => p.pstatus === 'Complete').length;
       const incompleteCount = allProjects.filter(p => p.pstatus === 'Incomplete').length;
@@ -321,8 +323,6 @@ app.post('/faculty/Search',ensureAuthenticated, async (req, res) => {
     } catch (err) {
         res.json({"results": err.message});
     }
-
-//First draft of a get function for generating and populating the left-hand table in faculty.html. still unsure of how to call this function from the html file itself, or if im supposed to be doing that in the first place
 });
 
 app.get('/faculty/company', ensureAuthenticated, async (req, res) => {
@@ -349,9 +349,9 @@ app.get('/faculty/company', ensureAuthenticated, async (req, res) => {
  res.json({"results": "error"});
 }
 
-//Function to sort table by date in when date href clicked on /faculty
 });
 
+//Function to sort table by date in when date href clicked on /faculty
 app.get('/faculty/date', ensureAuthenticated, async (req, res) => {
 	 
   try {
@@ -468,7 +468,7 @@ app.get('/allinformation/:projectid', ensureAuthenticated, async (req, res) => {
 
   
 });
-//first draft of a get function for generating a table on the right-hand side of faculty.html with all the information about a project based on what project you clicked from the left-hand table
+
 app.get('/allinformation/statusupdate/:projectid', ensureAuthenticated, async (req, res) => {
   try {
 	await db.updateProjectStatus(Number(req.params.projectid));
