@@ -98,11 +98,24 @@ passport.use(new OneLoginStrategy({
   
   // Middleware to check authentication
   function ensureAuthenticated(req, res, next) {
+    if (process.env.NODE_ENV === 'development') {
+      // Simulate a logged-in user
+      req.user = { name: 'Dev User', email: 'dev@example.com' };
+      return next();
+    }
+  
     if (req.isAuthenticated()) {
       return next();
     }
     res.redirect('/home');
   }
+  
+  /*function ensureAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+      return next();
+    }
+    res.redirect('/home');
+  }*/
 
 function addresses(ids){
   var email = "";
