@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Info</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .btn {
+            background-color: rgb(238, 42, 55);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-block;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: rgb(169, 36, 45);
+        }
+
+        .section {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+
+        h2 {
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            color: #444;
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+
+        .col {
+            flex: 1 1 300px;
+            font-size: 18px;
+        }
+
+        a {
+            color: #007BFF;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table th, table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        table th {
+            background-color: #f9f9f9;
+            font-weight: 600;
+            text-align: left;
+        }
+
+        table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        form {
+            margin-top: 30px;
+        }
+
+        form button {
+            background-color: #dc3545;
+        }
+
+        form button:hover {
+            background-color: #c82333;
+        }
+        
+        p {
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <a href="/faculty" class="btn">Back</a>
+
+        <div class="section">
+            <h2>Project Overview</h2>
+            <div class="row">
+                <div class="col"><strong>Project ID:</strong> {{information.0.projectID}}</div>
+                <div class="col"><strong>Status:</strong> <a href="statusupdate/{{information.0.projectID}}">{{information.0.pstatus}}</a></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Company Information</h2>
+            <div class="row">
+                <div class="col"><strong>Company Name:</strong> {{information.0.name}}</div>
+                <div class="col"><strong>Contact:</strong> {{information.0.first}} {{information.0.last}}</div>
+                <div class="col"><strong>Email:</strong> <a href="mailto:{{information.0.email}}">{{information.0.email}}</a></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Additional Details</h2>
+            <div class="row">
+                <div class="col"><strong>Phone:</strong> {{information.0.phone}}</div>
+                <div class="col"><strong>Timeline:</strong> {{information.0.TimeLine}}</div>
+                <div class="col"><strong>Student Contact:</strong> {{information.0.radio}}, {{information.0.helpAvail}}</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Location & Web</h2>
+            <div class="row">
+                <div class="col"><strong>Address:</strong> {{information.0.street}}, {{information.0.city}}, {{information.0.state}}, {{information.0.zip}}</div>
+                <div class="col"><strong>Website:</strong> <a href="https://{{information.0.companyWeb}}" target="_blank">{{information.0.companyWeb}}</a></div>
+                <div class="col"><strong>Submitted:</strong> {{information.0.Date}}</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Project Description</h2>
+            <p>{{information.0.Description}}</p>
+        </div>
+
+        <div class="section">
+            <h2>Departments Involved</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Department</th>
+                        <th>Chair</th>
+                        <th>Email</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each information}}
+                        <tr>
+                            <td>{{this.depName}}</td>
+                            <td>{{this.head}}</td>
+                            <td><a href="mailto:{{this.depEmail}}">{{this.depEmail}}</a></td>
+                            <td><a href="/allinformation/deleteDep/{{this.projectID}}/{{this.depName}}">Remove</a></td>
+                        </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+
+        <form id="deleteForm" action="/allinformation/delete/{{information.1.projectID}}">
+            <button type="submit" class="btn">Delete Project</button>
+        </form>
+    </div>
+
+</body>
+</html>

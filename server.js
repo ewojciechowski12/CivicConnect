@@ -458,7 +458,7 @@ app.get('/allinformation/:projectid', ensureAuthenticated, async (req, res) => {
         
     	const projectInfo = await db.getAllInformationByProjectID(Number(req.params.projectid));
     	if(projectInfo) {
-        res.render('allInfoTable', {information: projectInfo});
+        res.render('projectInformation', {information: projectInfo});
     	} else {
         	res.json({"results": "none"});
     	}
