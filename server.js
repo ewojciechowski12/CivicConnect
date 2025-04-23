@@ -207,7 +207,7 @@ app.get('/', function(req, res, next) {
 
 /* GET home page. */
 app.get('/home', function(req, res, next) {
-    res.render('index', { title: 'Civic Connect Login' });
+    res.render('login', { title: 'Civic Connect Login' });
   });
 
 // Login route
