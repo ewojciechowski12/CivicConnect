@@ -303,7 +303,7 @@ app.get('/faculty', ensureAuthenticated, async (req, res) => {
       sortDate = true;
 
 	    if(allProjects) {
-        	res.render('leftHandTable', {allCount,completeCount,incompleteCount,waitingCount,projects: allProjects});
+        	res.render('allProjects', {allCount,completeCount,incompleteCount,waitingCount,projects: allProjects});
           
 	    } else {
         	res.json({"results": "none"});
@@ -319,7 +319,7 @@ app.post('/faculty/Search',ensureAuthenticated, async (req, res) => {
             res.redirect('/faculty')
         }
         const allProjects = await db.getAllProjectsSearch("%" + req.body.Search + "%");
-        res.render('leftHandTable', {projects: allProjects});        
+        res.render('allProjects', {projects: allProjects});        
     } catch (err) {
         res.json({"results": err.message});
     }
@@ -341,7 +341,7 @@ app.get('/faculty/company', ensureAuthenticated, async (req, res) => {
         sortDep = false;
     }
  if(allProjects) {
-     res.render('leftHandTable', {projects: allProjects});
+     res.render('allProjects', {projects: allProjects});
  } else {
      res.json({"results": "none"});
  }
@@ -368,7 +368,7 @@ app.get('/faculty/date', ensureAuthenticated, async (req, res) => {
         sortDep = false;
     }
 if(allProjects) {
-     res.render('leftHandTable', {projects: allProjects});
+     res.render('allProjects', {projects: allProjects});
  } else {
      res.json({"results": "none"});
  }
@@ -409,7 +409,7 @@ app.get('/faculty/status', ensureAuthenticated, async (req, res) => {
     const waitingCount = allProjects.filter(p => p.pstatus === 'Waiting').length;
     
     if(allProjects && allProjects.length > 0) {
-      res.render('leftHandTable', {
+      res.render('allProjects', {
         projects: allProjects, 
         currentStatus: status,
         allCount,
@@ -443,7 +443,7 @@ app.get('/faculty/department', ensureAuthenticated, async (req, res) => {
         sortDep = true;
     }
  if(allProjects) {
-     res.render('leftHandTable', {projects: allProjects});
+     res.render('allProjects', {projects: allProjects});
  } else {
      res.json({"results": "none"});
  }
