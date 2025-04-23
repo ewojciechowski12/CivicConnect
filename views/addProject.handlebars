@@ -117,7 +117,16 @@
 
     <div class="form-group">
       <label for="pStatus">Project Status:</label>
-      <textarea id="pStatus" name="pStatus" required></textarea>
+      <select id="pStatus" name="pStatus" required>
+        <option value="Waiting">Waiting</option>
+        <option value="Complete">Complete</option>
+        <option value="Incomplete">Incomplete</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="compDate">Completion Date:</label>
+      <input type="date" id="compDate" name="compDate" required>
     </div>
 
     <div class="form-group">
