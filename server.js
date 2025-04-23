@@ -107,14 +107,14 @@ passport.use(new OneLoginStrategy({
     if (req.isAuthenticated()) {
       return next();
     }
-    res.redirect('/home');
+    res.redirect('/login');
   }
   
   /*function ensureAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
       return next();
     }
-    res.redirect('/home');
+    res.redirect('/login');
   }*/
 
 function addresses(ids){
@@ -207,7 +207,7 @@ app.get('/', function(req, res, next) {
 
 /* GET home page. */
 app.get('/home', function(req, res, next) {
-    res.render('login', { title: 'Civic Connect Login' });
+    res.render('form', { layout: false });
   });
 
 // Login route
@@ -220,7 +220,7 @@ app.get('/login', passport.authenticate('openidconnect', {
 app.get('/oauth/callback', passport.authenticate('openidconnect', {
     callback: true,
     successReturnToOrRedirect: '/faculty', // Redirect to faculty page after successful login
-    failureRedirect: '/home'
+    failureRedirect: '/login'
   }));
 
 
@@ -234,7 +234,7 @@ app.get('/logout', function(req, res) {
             return res.status(500).send('Error logging out');
         }
         // Successful logout
-        res.redirect('/home'); // Redirect to homepage or wherever you want
+        res.redirect('/login'); // Redirect to login
     });
 });
 
