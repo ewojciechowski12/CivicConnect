@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project Info</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -170,7 +172,9 @@
                             <td>
                                 <form action="/allinformation/deleteDep/{{this.projectID}}" method="POST">
                                     <input type="hidden" name="departmentID" value="{{this.departmentID}}" />
-                                    <button type="submit">Remove</button>
+                                    <button type="submit" class="trash-btn">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                 </form>
                             </td>
                         </tr>
