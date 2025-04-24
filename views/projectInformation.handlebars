@@ -167,7 +167,12 @@
                             <td>{{this.depName}}</td>
                             <td>{{this.head}}</td>
                             <td><a href="mailto:{{this.depEmail}}">{{this.depEmail}}</a></td>
-                            <td><a href="/allinformation/deleteDep/{{this.projectID}}/{{this.depName}}">Remove</a></td>
+                            <td>
+                                <form action="/allinformation/deleteDep/{{this.projectID}}" method="POST">
+                                    <input type="hidden" name="departmentID" value="{{this.departmentID}}" />
+                                    <button type="submit">Remove</button>
+                                </form>
+                            </td>
                         </tr>
                     {{/each}}
                 </tbody>

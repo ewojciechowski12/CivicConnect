@@ -349,7 +349,7 @@ class DBAbstraction {
         }
 		 
     	const sql = `
-		SELECT Project.projectID, Project.Description, Project.pstatus, Project.TimeLine, Project.Date, Project.radio, Project.helpAvail, Company.name, Company.street, Company.city, Company.state, Company.zip, Company.first, Company.last, Company.phone, Company.email, Company.companyWeb, Department.depName, Department.head, Department.depEmail
+		SELECT Project.projectID, Project.Description, Project.pstatus, Project.TimeLine, Project.Date, Project.radio, Project.helpAvail, Company.name, Company.street, Company.city, Company.state, Company.zip, Company.first, Company.last, Company.phone, Company.email, Company.companyWeb, Department.depName, Department.head, Department.depEmail, Department.departmentID
 		FROM Project, Company, Department, ProjectDepartment
 		WHERE Project.CompanyID = Company.companyID 
 		AND Project.projectID = ?
@@ -415,17 +415,16 @@ class DBAbstraction {
 
     }
 
-	deleteProjectDep(proID, depName)
+	deleteProjectDep(proID, depID)
     {
    	 const sql = `
-   		DELETE ProjectDepartment
-		FROM ProjectDepartment 
-		WHERE projectID = ? COLLATE NOCASE
-		AND departmentID = ? COLLATE NOCASE;
+   		DELETE FROM ProjectDepartment 
+		WHERE ProjectDepartment.projectID = ? COLLATE NOCASE
+		AND ProjectDepartment.departmentID = ? COLLATE NOCASE;
    	 `;
 
    	 return new Promise((resolve, reject) => {
-   		 this.db.run(sql, [proID, depName], (err) => {            	 
+   		 this.db.run(sql, [proID, depID], (err) => {            	 
             	if(err) {
                 	reject(err);
             	} else {
@@ -762,6 +761,25 @@ deleteUnusedCompany()
             	}
         	});
     	});
+	}
+
+	//Verify that Department Exists
+	getDepartmentIDbyID(id) {
+		const sql = `
+			SELECT Department.departmentID
+			from Department
+			WHERE Department.departmentID = ?;
+		`;
+
+		return new Promise((resolve, reject) => {
+			this.db.get(sql, [name], (err, row) => {
+				if (err) {
+					reject(err);
+				} else {
+					resolve(row ? row.companyID : null);
+				}
+			});
+		});
 	}
 
 }

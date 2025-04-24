@@ -466,7 +466,6 @@ app.get('/allinformation/:projectid', ensureAuthenticated, async (req, res) => {
 	} catch (err) {
     	res.json({"results": "error"});
 	}
-
   
 });
 
@@ -496,21 +495,27 @@ app.get('/allinformation/delete/:projectid', ensureAuthenticated, async(req, res
   }
 });
 
-app.get('/allinformation/deleteDep/:projectid/:depName', ensureAuthenticated, async(req, res) => {
+//Remove Department From Project
+app.post('/allinformation/deleteDep/:projectid', ensureAuthenticated, async(req, res) => {
   try {
+    
+    //var depID = db.getDepartmentID(req.params.depName);
+    const { departmentID } = req.body;
 
-    var depID = db.getDepartmentID(req.params.depName);
-
-    if(depID){
-      // Use projectIdToDelete to delete the project from your database
-      await db.deleteProjectDep(Number(req.params.projectid), depID);
-      // Redirect to the desired page after successful deletion
-      res.redirect(`/allinformation/${req.params.projectid}`); // Adjust the redirect URL as needed
+    if(!departmentID){
+      return res.status(400).json({ error: 'Department ID required' });
     }
+
+    const projectID = req.params.projectid;
+    const result = await db.deleteProjectDep(projectID, departmentID);
+
+    res.redirect(`/allinformation/${projectID}`);
+
+    //res.json({ message: 'Department removed from project', changes: result });
       
   } catch (error) {
       // Handle any errors that occur during deletion
-      console.error('Error deleting project:', error);
+      console.error('Error deleting department:', error);
       res.status(500).send('Internal Server Error'); // Respond with an appropriate error message
   }
 });
@@ -571,7 +576,6 @@ app.post('/addProject', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
-
 
  
 app.use((req, res) => {
