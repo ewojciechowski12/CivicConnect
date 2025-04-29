@@ -457,11 +457,13 @@ app.get('/faculty/department', ensureAuthenticated, async (req, res) => {
 app.get('/allinformation/:projectid', ensureAuthenticated, async (req, res) => {
 	try {
         
-    	const projectInfo = await db.getAllInformationByProjectID(Number(req.params.projectid));
+    	const projectInfo = await db.getAllInformationByProjectID(Number(req.params.projectid));      
+      const departments = await db.getAllDepartments();
+
     	if(projectInfo) {
-        res.render('projectInformation', {information: projectInfo});
+        res.render('projectInformation', {departments, information: projectInfo });
     	} else {
-        	res.json({"results": "none"});
+        res.json({"results": "none"});
     	}
 	} catch (err) {
     	res.json({"results": "error"});
@@ -499,7 +501,6 @@ app.get('/allinformation/delete/:projectid', ensureAuthenticated, async(req, res
 app.post('/allinformation/deleteDep/:projectid', ensureAuthenticated, async(req, res) => {
   try {
     
-    //var depID = db.getDepartmentID(req.params.depName);
     const { departmentID } = req.body;
 
     if(!departmentID){
@@ -508,6 +509,7 @@ app.post('/allinformation/deleteDep/:projectid', ensureAuthenticated, async(req,
 
     const projectID = req.params.projectid;
     const result = await db.deleteProjectDep(projectID, departmentID);
+    
 
     res.redirect(`/allinformation/${projectID}`);
 
