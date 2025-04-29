@@ -177,7 +177,7 @@
                 </button>
                 <div class="add-department-form" style="display: none; margin-top: 10px;">
                     <form action="/allinformation/addDep/{{information.0.projectID}}" method="POST">
-                        <select name="departmentID" required>
+                        <select name="departmentID" class="test-dropdown-select" required>
                         {{#each departments}}
                             <option value="{{this.departmentID}}">{{this.depName}}</option>
                         {{/each}}
