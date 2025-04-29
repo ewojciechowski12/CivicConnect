@@ -782,5 +782,22 @@ deleteUnusedCompany()
 		});
 	}
 
+	getAllDepartments(){
+		const sql=`
+		SELECT Department.departmentID, Department.depName
+		from Department`
+
+		return new Promise((resolve, reject) => {
+        	this.db.all(sql, [], (err, row) => {
+            	if(err) {					
+                	reject(err);
+            	} else {
+                	resolve(row);
+            	}
+        	});
+    	});
+	}	
+	
+
 }
 module.exports = DBAbstraction;
