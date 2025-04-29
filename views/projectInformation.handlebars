@@ -76,8 +76,9 @@
         }
 
         table th, table td {
-            padding: 12px 15px;
+            padding: 12px 25px;
             border-bottom: 1px solid #ddd;
+            vertical-align: middle;
         }
 
         table th {
@@ -92,18 +93,35 @@
 
         form {
             margin-top: 30px;
-        }
-
-        form button {
-            background-color: #dc3545;
-        }
-
-        form button:hover {
-            background-color: #c82333;
-        }
+        }        
         
         p {
             font-size: 18px;
+        }
+        .add-department-form {
+            display: flex;
+            align-items: center;
+            gap: 10px; /* Adjust the space between the dropdown and button */
+        }
+
+        .add-department-form select {
+            padding: 8px;
+            font-size: 16px;
+            width: 50%;
+        }
+
+        .add-department-form button {
+            padding: 8px 16px;
+            font-size: 16px;
+            background-color: rgb(238, 42, 55);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .add-department-form button:hover {
+            background-color: rgb(169, 36, 45);
         }
     </style>
 </head>
@@ -153,14 +171,29 @@
         </div>
 
         <div class="section">
-            <h2>Departments Involved</h2>
+            <h2>Departments Involved 
+                <button type="button" class="add-btn" title="Add department" onclick="toggleDropdown()">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <div class="add-department-form" style="display: none; margin-top: 10px;">
+                    <form action="/allinformation/addDep/{{information.0.projectID}}" method="POST">
+                        <select name="departmentID" required>
+                        {{#each departments}}
+                            <option value="{{this.departmentID}}">{{this.depName}}</option>
+                        {{/each}}
+                        </select>
+                        <button type="submit" class="btn">Add</button>
+                    </form>
+                </div>
+            </h2>
+            
             <table>
                 <thead>
                     <tr>
                         <th>Department</th>
                         <th>Chair</th>
                         <th>Email</th>
-                        <th>Actions</th>
+                        <th>Actions</th>                        
                     </tr>
                 </thead>
                 <tbody>
@@ -170,13 +203,16 @@
                             <td>{{this.head}}</td>
                             <td><a href="mailto:{{this.depEmail}}">{{this.depEmail}}</a></td>
                             <td>
-                                <form action="/allinformation/deleteDep/{{this.projectID}}" method="POST">
-                                    <input type="hidden" name="departmentID" value="{{this.departmentID}}" />
-                                    <button type="submit" class="trash-btn">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
-                            </td>
+                                <div class="button-group">
+                                    <!--Remove Button-->
+                                    <form action="/allinformation/deleteDep/{{this.projectID}}" method="POST">
+                                        <input type="hidden" name="departmentID" value="{{this.departmentID}}" />
+                                        <button type="submit" class="trash-btn">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>                                
+                                </div>
+                            </td>                            
                         </tr>
                     {{/each}}
                 </tbody>
@@ -190,3 +226,13 @@
 
 </body>
 </html>
+
+<script>
+    const addBtn = document.querySelector('.add-btn');
+    const addForm = document.querySelector('.add-department-form');  // Select the first element with this class
+
+    addBtn.addEventListener('click', function (e) {
+    e.preventDefault();
+    addForm.style.display = addForm.style.display === 'none' ? 'block' : 'none';
+    });
+</script>

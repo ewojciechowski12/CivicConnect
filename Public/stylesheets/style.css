@@ -594,13 +594,18 @@ select {
 }
 
 .trash-btn {
-  color: red;
   background: none;
   border: none;
+  color: red;
   cursor: pointer;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
   transition: color 0.3s ease;
-  padding-bottom: 5px;
 }
 
 .trash-btn:hover {
@@ -608,8 +613,42 @@ select {
   background: none;
 }
 
-.trash-btn i {
-  vertical-align: middle;
+
+/* Icon tweak */
+.trash-btn i, .add-btn i {
   position: relative;
-  top: -14px; /* or try -2px depending on how high you want it */
+  top: 1px;
+  
+}
+
+.icon-form {
+  display: inline-block;
+  margin: 0;
+}
+
+.add-btn {
+  background: none;
+  border: none;
+  color: #28a745;  
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-btn:hover {
+  color: darkgreen;
+  background: none;
+}
+
+.button-group {
+  display: flex;
+  justify-content: center; /* center horizontally */
+  align-items: center;     /* center vertically */
+  height: 100%;}
+
+.button-group form {
+  margin: 0;
+  padding: 0;
 }
