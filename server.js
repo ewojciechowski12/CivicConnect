@@ -520,6 +520,30 @@ app.post('/allinformation/deleteDep/:projectid', ensureAuthenticated, async(req,
   }
 });
 
+// Add department to project that is already created
+app.post('/allinformation/addDep/:projectid', ensureAuthenticated, async(req, res) => {
+  try {
+    
+    //var depID = db.getDepartmentID(req.params.depName);
+    const { departmentID } = req.body;
+
+    if(!departmentID){
+      return res.status(400).json({ error: 'Department ID required' });
+    }
+
+    const projectID = req.params.projectid;
+    const result = await db.deleteProjectDep(projectID, departmentID);
+    await db.insertProjectDepartment(departmentID, projectID);
+
+    res.redirect(`/allinformation/${projectID}`);    
+      
+  } catch (error) {
+      // Handle any errors that occur during deletion
+      console.error('Error adding department:', error);
+      res.status(500).send('Internal Server Error'); // Respond with an appropriate error message
+  }
+});
+
 // Page for faculty to manually add project
 app.get('/addProject', ensureAuthenticated, (req, res) => {
   res.render('addProject'); 
