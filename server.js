@@ -307,7 +307,7 @@ app.get('/faculty', ensureAuthenticated, async (req, res) => {
         	res.render('allProjects', {allCount,completeCount,incompleteCount,waitingCount,projects: allProjects});
           
 	    } else {
-        	res.json({"results": "none"});
+        	res.json({"results": "no projects"});
 	    }
     } catch (err) {
 	    res.json({"results": err.message});
@@ -463,7 +463,7 @@ app.get('/allinformation/:projectid', ensureAuthenticated, async (req, res) => {
     	if(projectInfo) {
         res.render('projectInformation', {departments, information: projectInfo });
     	} else {
-        res.json({"results": "none"});
+        res.json({"results": "no project with id " + req.params.projectid});
     	}
 	} catch (err) {
     	res.json({"results": "error"});
