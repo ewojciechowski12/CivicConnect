@@ -301,11 +301,12 @@ app.get('/faculty', ensureAuthenticated, async (req, res) => {
       const completeCount = allProjects.filter(p => p.pstatus === 'Complete').length;
       const incompleteCount = allProjects.filter(p => p.pstatus === 'Incomplete').length;
       const waitingCount = allProjects.filter(p => p.pstatus === 'Waiting').length;
+      const archivedCount = allProjects.filter(p => p.pstatus === 'Archived').length;
 
       sortDate = true;
 
 	    if(allProjects) {
-        	res.render('allProjects', {allCount,completeCount,incompleteCount,waitingCount,projects: allProjects});
+        	res.render('allProjects', {allCount,completeCount,incompleteCount,waitingCount,archivedCount, projects: allProjects});
           
 	    } else {
         	res.json({"results": "no projects"});
@@ -409,6 +410,7 @@ app.get('/faculty/status', ensureAuthenticated, async (req, res) => {
     const completeCount = allProjects.filter(p => p.pstatus === 'Complete').length;
     const incompleteCount = allProjects.filter(p => p.pstatus === 'Incomplete').length;
     const waitingCount = allProjects.filter(p => p.pstatus === 'Waiting').length;
+    const archivedCount = allProjects.filter(p => p.pstatus === 'Archived').length;
     
     if(allProjects && allProjects.length > 0) {
       res.render('allProjects', {
@@ -417,7 +419,8 @@ app.get('/faculty/status', ensureAuthenticated, async (req, res) => {
         allCount,
         completeCount,
         incompleteCount,
-        waitingCount
+        waitingCount,
+        archivedCount
       });
     } else {
         res.json({"results": "none"});
