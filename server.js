@@ -283,7 +283,8 @@ app.post('/project', async (req, res) => {
   
       mailer(req.body);
   
-      res.send('Thank you for your project submission.');
+      //res.send('Thank you for your project submission.');
+      res.render('thankYou', { layout: 'main', title: 'Thank You'  });
     } catch (error) {
       console.error(error);
       res.status(500).send('Internal Server Error');
@@ -549,6 +550,10 @@ app.post('/allinformation/addDep/:projectid', ensureAuthenticated, async(req, re
 // Page for faculty to manually add project
 app.get('/addProject', ensureAuthenticated, (req, res) => {
   res.render('addProject'); 
+});
+
+app.get('/thankYou',(req, res) => {
+  res.render('thankYou', { layout: 'main', title: 'Thank You'  });
 });
 
 // Push project to database from /addProject
