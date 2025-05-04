@@ -366,24 +366,19 @@ class DBAbstraction {
             	}
         	});
     	});
-	}
+	}	
 
-	updateProjectStatus(proID)
+	updateProjectStatus(pStatus, proID)
     {
    	 const sql = `
    	 UPDATE Project
-   	 SET pstatus =
-   	 CASE
-   	 WHEN pstatus = 'Incomplete' THEN 'Complete'
-   	 WHEN pstatus = 'Waiting' THEN 'Incomplete'
-   	 WHEN pstatus = 'Complete' THEN 'Waiting'
-   	 ELSE 'Waiting' END
+   	 SET pstatus = ?   	 
    	 WHERE projectID = ? COLLATE NOCASE;
    	 `;
 
     
    	 return new Promise((resolve, reject) => {
-   		 this.db.run(sql, [proID], (err) => {            	 
+   		 this.db.run(sql, [pStatus, proID], (err) => {            	 
             	if(err) {
                 	reject(err);
             	} else {
