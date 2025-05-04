@@ -219,11 +219,10 @@
             </table>
         </div>
 
-        <form id="deleteForm" action="/allinformation/delete/{{information.0.projectID}}">
+        <form id="deleteForm" action="/allinformation/delete/{{information.0.projectID}}" method="POST" onsubmit="return confirmDelete()">
             <button type="submit" class="btn">Delete Project</button>
         </form>
     </div>
-
 </body>
 </html>
 
@@ -235,4 +234,9 @@
     e.preventDefault();
     addForm.style.display = addForm.style.display === 'none' ? 'block' : 'none';
     });
+
+    // Confirmation logic
+    function confirmDelete() {
+        return confirm('Are you sure you want to delete this project?');
+    }
 </script>

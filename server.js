@@ -482,7 +482,7 @@ app.get('/allinformation/statusupdate/:projectid', ensureAuthenticated, async (r
   res.redirect('/allinformation/' + req.params.projectid);
 });
 
-app.get('/allinformation/delete/:projectid', ensureAuthenticated, async(req, res) => {
+app.post('/allinformation/delete/:projectid', ensureAuthenticated, async(req, res) => {
   try {
     
       // Use projectIdToDelete to delete the project from your database
