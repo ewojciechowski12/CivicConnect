@@ -472,9 +472,9 @@ app.get('/allinformation/:projectid', ensureAuthenticated, async (req, res) => {
   
 });
 
-app.get('/allinformation/statusupdate/:projectid', ensureAuthenticated, async (req, res) => {
+app.post('/allinformation/statusupdate/:projectid', ensureAuthenticated, async (req, res) => {
   try {
-	await db.updateProjectStatus(Number(req.params.projectid));
+	await db.updateProjectStatus(req.body.pStatus,Number(req.params.projectid));
 
   } catch (err) {
 	res.json({"results": "error"});

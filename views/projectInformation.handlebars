@@ -123,6 +123,40 @@
         .add-department-form button:hover {
             background-color: rgb(169, 36, 45);
         }
+
+        .status-edit {
+            display: flex; /* Initially hidden */
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }        
+
+        .status-edit select {
+            padding: 6px;
+            font-size: 14px;
+            width: 180px;
+        }
+
+        .status-edit .btn {
+            padding: 6px 12px;
+            font-size: 14px;
+            background-color: rgb(238, 42, 55);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .status-edit .btn:hover {
+            background-color: rgb(169, 36, 45);
+        }
+
+        .status-edit-toggle {
+            margin-left: 10px;
+            padding: 5px 10px;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -134,7 +168,24 @@
             <h2>Project Overview</h2>
             <div class="row">
                 <div class="col"><strong>Project ID:</strong> {{information.0.projectID}}</div>
-                <div class="col"><strong>Status:</strong> <a href="statusupdate/{{information.0.projectID}}">{{information.0.pstatus}}</a></div>
+
+                <div class="col">
+                    <strong>Status:</strong> 
+                    <span id="status-text">{{information.0.pstatus}}</span>
+                    <button type="button" onclick="toggleStatusEdit()" class="btn status-edit-toggle">Edit</button>
+
+                    <form id="status-form" action="/allinformation/statusupdate/{{information.0.projectID}}" method="POST" class="status-edit"
+                    style="display: none; margin-top: 10px;">
+                        <select name="pStatus" required>
+                            <option value="">-- Select Status --</option>
+                            <option value="Complete">Complete</option>
+                            <option value="Incomplete">Incomplete</option>
+                            <option value="Waiting">Waiting</option>
+                            <option value="Archived">Archive Project</option>
+                        </select>
+                        <button type="submit" class="btn">Save</button>
+                    </form>
+                </div>
             </div>
         </div>
 
@@ -230,13 +281,24 @@
     const addBtn = document.querySelector('.add-btn');
     const addForm = document.querySelector('.add-department-form');  // Select the first element with this class
 
+    // Toggle the visibility of the add department form
     addBtn.addEventListener('click', function (e) {
     e.preventDefault();
     addForm.style.display = addForm.style.display === 'none' ? 'block' : 'none';
     });
 
-    // Confirmation logic
+    // Project Deletion Confirmation logic
     function confirmDelete() {
         return confirm('Are you sure you want to delete this project?');
     }
+
+    // Toggle the visibility of the status edit form
+    const statusEditBtn = document.querySelector('.status-edit-toggle');
+    const statusForm = document.getElementById('status-form');
+    statusEditBtn.addEventListener('click', function (e) {
+        e.preventDefault();        
+        statusForm.style.display = statusForm.style.display === 'none' ? 'block' : 'none';
+    }); 
+    
+
 </script>
