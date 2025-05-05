@@ -298,6 +298,7 @@ app.post('/project', async (req, res) => {
        let allProjects = [];
        const sortBy = req.query.sort || 'date'; // Default to sorting by date
        const direction = req.query.direction === 'asc' ? 'asc' : 'desc'; // default to 'desc'
+       const status = req.query.status;   
 
        switch(sortBy){
 
@@ -323,7 +324,7 @@ app.post('/project', async (req, res) => {
           }
 
         case 'status':
-          const status = req.query.status;   
+          
           if(!status){
             if(sortStat){
                 allProjects = await db.getAllProjectsReverseSortByStatus();
@@ -369,11 +370,16 @@ app.post('/project', async (req, res) => {
        const incompleteCount = allProjects.filter(p => p.pstatus === 'Incomplete').length;
        const waitingCount = allProjects.filter(p => p.pstatus === 'Waiting').length;
        const archivedCount = allProjects.filter(p => p.pstatus === 'Archived').length;
- 
+      
+       const filteredProj = (!status || status === 'All')
+       ? allProjects
+       : allProjects.filter(p => p.pstatus === status);
+
+       
        sortDate = true;
  
-       if(allProjects) {
-           res.render('allProjects', {allCount,completeCount,incompleteCount,waitingCount,archivedCount, projects: allProjects});
+       if(filteredProj && filteredProj.length > 0) {
+           res.render('allProjects', {allCount,completeCount,incompleteCount,waitingCount,archivedCount, projects: filteredProj});
            
        } else {
            res.json({"results": "no projects"});
@@ -383,6 +389,7 @@ app.post('/project', async (req, res) => {
      }
  });
 
+ 
 app.post('/faculty/Search',ensureAuthenticated, async (req, res) => {
     try {
         if(req.body.Search == ""){
