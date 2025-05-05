@@ -291,30 +291,97 @@ app.post('/project', async (req, res) => {
     }
   });
 
-app.get('/faculty', ensureAuthenticated, async (req, res) => {
+  app.get('/faculty', ensureAuthenticated, async (req, res) => {
 	 
-   try {
-	    const allProjects = await db.getAllProjectsReverseSortByDate();
+    try {
+       //const allProjects = await db.getAllProjectsReverseSortByDate();
+       let allProjects = [];
+       const sortBy = req.query.sort || 'date'; // Default to sorting by date
+       const direction = req.query.direction === 'asc' ? 'asc' : 'desc'; // default to 'desc'
 
-      //Code to display count next to tableheaders on /faculty
-      const allCount = allProjects.length;
-      const completeCount = allProjects.filter(p => p.pstatus === 'Complete').length;
-      const incompleteCount = allProjects.filter(p => p.pstatus === 'Incomplete').length;
-      const waitingCount = allProjects.filter(p => p.pstatus === 'Waiting').length;
-      const archivedCount = allProjects.filter(p => p.pstatus === 'Archived').length;
+       switch(sortBy){
 
-      sortDate = true;
+        case 'date':
+          allProjects = direction === 'asc'
+            ? await db.getAllProjectsSortByDate()
+            : await db.getAllProjectsReverseSortByDate();
+          break;
 
-	    if(allProjects) {
-        	res.render('allProjects', {allCount,completeCount,incompleteCount,waitingCount,archivedCount, projects: allProjects});
-          
-	    } else {
-        	res.json({"results": "no projects"});
-	    }
-    } catch (err) {
-	    res.json({"results": err.message});
-    }
-});
+        case 'company':
+          if(sortComp){
+            allProjects = await db.getAllProjectsReverseSortByCompany();
+            sortComp = false;
+            break;
+          }
+          else{
+              allProjects = await db.getAllProjectsSortByCompany();
+              sortComp = true;
+              sortDate = false;
+              sortStat = false;
+              sortDep = false;
+              break;
+          }
+
+        case 'status':
+          const status = req.query.status;   
+          if(!status){
+            if(sortStat){
+                allProjects = await db.getAllProjectsReverseSortByStatus();
+                sortStat = false;
+                break;
+            }
+            else{
+                allProjects = await db.getAllProjectsSortByStatus();
+                sortComp = false;
+                sortDate = false;
+                sortStat = true;
+                sortDep = false;
+                break;
+            }
+          } else {      
+            allProjects = await db.getProjectByStatus(status);
+            break;      
+          }
+
+        case 'department':
+          if(sortDep){
+            allProjects = await db.getAllProjectsReverseSortByDepartment();
+            sortDep = false;
+            break;
+          }
+          else{
+              allProjects = await db.getAllProjectsSortByDepartment();
+              sortComp = false;
+              sortDate = false;
+              sortStat = false;
+              sortDep = true;
+              break;
+          }
+
+        default:
+          //allProjects = await db.getAllProjectsSortByDate();
+          break;
+      }   
+      
+       //Code to display count next to tableheaders on /faculty
+       const allCount = allProjects.length;
+       const completeCount = allProjects.filter(p => p.pstatus === 'Complete').length;
+       const incompleteCount = allProjects.filter(p => p.pstatus === 'Incomplete').length;
+       const waitingCount = allProjects.filter(p => p.pstatus === 'Waiting').length;
+       const archivedCount = allProjects.filter(p => p.pstatus === 'Archived').length;
+ 
+       sortDate = true;
+ 
+       if(allProjects) {
+           res.render('allProjects', {allCount,completeCount,incompleteCount,waitingCount,archivedCount, projects: allProjects});
+           
+       } else {
+           res.json({"results": "no projects"});
+       }
+     } catch (err) {
+       res.json({"results": err.message});
+     }
+ });
 
 app.post('/faculty/Search',ensureAuthenticated, async (req, res) => {
     try {
@@ -326,135 +393,6 @@ app.post('/faculty/Search',ensureAuthenticated, async (req, res) => {
     } catch (err) {
         res.json({"results": err.message});
     }
-});
-
-app.get('/faculty/company', ensureAuthenticated, async (req, res) => {
-	 
-  try {
-    var allProjects;
-    if(sortComp){
-        allProjects = await db.getAllProjectsReverseSortByCompany();
-        sortComp = false;
-    }
-    else{
-        allProjects = await db.getAllProjectsSortByCompany();
-        sortComp = true;
-        sortDate = false;
-        sortStat = false;
-        sortDep = false;
-    }
- if(allProjects) {
-     res.render('allProjects', {projects: allProjects});
- } else {
-     res.json({"results": "none"});
- }
-} catch (err) {
- res.json({"results": "error"});
-}
-
-});
-
-//Function to sort table by date in when date href clicked on /faculty
-app.get('/faculty/date', ensureAuthenticated, async (req, res) => {
-	 
-  try {
-    var allProjects;
-    if(!sortDate){
-        allProjects = await db.getAllProjectsReverseSortByDate();
-        sortDate = true;
-    }
-    else{
-        allProjects = await db.getAllProjectsSortByDate();
-        sortComp = false;
-        sortDate = false;
-        sortStat = false;
-        sortDep = false;
-    }
-if(allProjects) {
-     res.render('allProjects', {projects: allProjects});
- } else {
-     res.json({"results": "none"});
- }
-} catch (err) {
- res.json({"results": "error"});
-}
-
-//Function to sort table by status when status href clicked on /faculty
-});
-
-app.get('/faculty/status', ensureAuthenticated, async (req, res) => {
-	 
-  try {    
-
-    var allProjects;
-    const status = req.query.status;    
-
-    if(!status){
-      if(sortStat){
-          allProjects = await db.getAllProjectsReverseSortByStatus();
-          sortStat = false;
-      }
-      else{
-          allProjects = await db.getAllProjectsSortByStatus();
-          sortComp = false;
-          sortDate = false;
-          sortStat = true;
-          sortDep = false;
-      }
-    } else {      
-      allProjects = await db.getProjectByStatus(status);      
-    }  
-
-    //Code to display count next to th on /faculty
-    const allCount = allProjects.length;    
-    const completeCount = allProjects.filter(p => p.pstatus === 'Complete').length;
-    const incompleteCount = allProjects.filter(p => p.pstatus === 'Incomplete').length;
-    const waitingCount = allProjects.filter(p => p.pstatus === 'Waiting').length;
-    const archivedCount = allProjects.filter(p => p.pstatus === 'Archived').length;
-    
-    if(allProjects && allProjects.length > 0) {
-      res.render('allProjects', {
-        projects: allProjects, 
-        currentStatus: status,
-        allCount,
-        completeCount,
-        incompleteCount,
-        waitingCount,
-        archivedCount
-      });
-    } else {
-        res.json({"results": "none"});
-    }
-  } catch (err) {    
-  res.json({"results": "error"});
-}
-
-});
-
-//Function to sort table by department when department href clicked on /faculty
-app.get('/faculty/department', ensureAuthenticated, async (req, res) => {
-	 
-  try {
-    var allProjects;
-    if(sortDep){
-        allProjects = await db.getAllProjectsReverseSortByDepartment();
-        sortDep = false;
-    }
-    else{
-        allProjects = await db.getAllProjectsSortByDepartment();
-        sortComp = false;
-        sortDate = false;
-        sortStat = false;
-        sortDep = true;
-    }
- if(allProjects) {
-     res.render('allProjects', {projects: allProjects});
- } else {
-     res.json({"results": "none"});
- }
-} catch (err) {
- res.json({"results": "error"});
-}
 });
 
 //Function to display all information when id href clicked in /faculty

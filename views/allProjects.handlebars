@@ -40,14 +40,14 @@
 
 <table class="table-striped table-hover table-interactive" overflow-y="hidden" > 
     <thead>         
-        <tr>
-            <th width="5%"><a href="/faculty/date" tabindex="1" class="noVisual">Project ID</a></th>
-            <th width="8%"><a href="/faculty/company" tabindex="1" class="noVisual">Company</a></th>
+         <tr>      
+            <th width="5%"><a href="#" tabindex="1" class="noVisual sortable" data-sort="date">Project ID</a></th>
+            <th width="8%"><a href="#" tabindex="1" class="noVisual sortable" data-sort="company">Company</a></th>
             <th width="7%">Contact</th>
             <th width="40%">Description</th>
-            <th width="10%"><a href="/faculty/date" tabindex="1" class="noVisual">Submission Date</a></th>
-            <th width="10%"><a href="/faculty/status" tabindex="1" class="noVisual">Status</a></th>
-            <th width="20%"><a href="/faculty/department" tabindex="1" class="noVisual">Department</a></th>
+            <th width="10%"><a href="#" tabindex="1" class="noVisual sortable" data-sort="date">Submission Date</a></th>
+            <th width="10%"><a href="#" tabindex="1" class="noVisual sortable" data-sort="status">Status</a></th>
+            <th width="20%"><a href="#" tabindex="1" class="noVisual sortable" data-sort="department">Department</a></th>
         </tr>
     </thead> 
  
@@ -93,6 +93,19 @@
                 // Add 'selected' class to clicked link and remove from others
                 states.forEach(s => s.classList.remove('selected'));
                 state.classList.add('selected');
+            });
+        });
+
+        const currentSort = new URLSearchParams(window.location.search).get("sort") || "date";
+        const currentDirection = new URLSearchParams(window.location.search).get("direction") || "asc";
+
+            document.querySelectorAll(".sortable").forEach(link => {
+            link.addEventListener("click", e => {
+            e.preventDefault();
+            const sort = link.dataset.sort;
+            const isSameSort = sort === currentSort;
+            const newDirection = isSameSort && currentDirection === "asc" ? "desc" : "asc";
+            window.location.href = `/faculty?sort=${sort}&direction=${newDirection}`;
             });
         });
     });   
