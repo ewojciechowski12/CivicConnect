@@ -392,11 +392,19 @@ app.post('/project', async (req, res) => {
  
 app.post('/faculty/Search',ensureAuthenticated, async (req, res) => {
     try {
-        if(req.body.Search == ""){
-            res.redirect('/faculty')
-        }
-        const allProjects = await db.getAllProjectsSearch("%" + req.body.Search + "%");
-        res.render('allProjects', {projects: allProjects});        
+      if(req.body.Search == ""){
+          res.redirect('/faculty')
+      }
+      const allProjects = await db.getAllProjectsSearch("%" + req.body.Search + "%");
+
+      //Code to display count next to tableheaders
+      const allCount = allProjects.length;
+      const completeCount = allProjects.filter(p => p.pstatus === 'Complete').length;
+      const incompleteCount = allProjects.filter(p => p.pstatus === 'Incomplete').length;
+      const waitingCount = allProjects.filter(p => p.pstatus === 'Waiting').length;
+      const archivedCount = allProjects.filter(p => p.pstatus === 'Archived').length;
+
+      res.render('allProjects', {allCount,completeCount,incompleteCount,waitingCount,archivedCount, projects: allProjects});
     } catch (err) {
         res.json({"results": err.message});
     }
