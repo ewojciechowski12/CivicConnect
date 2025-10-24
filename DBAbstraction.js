@@ -150,7 +150,8 @@ class DBAbstraction {
             OR Company.Name like ? COLLATE NOCASE
             OR Company.first like ? COLLATE NOCASE
 			OR Project.ProjectID like ? COLLATE NOCASE
-        );
+        )
+		GROUP BY Project.projectID;
         `;
         return new Promise((resolve, reject) => { 
             this.db.all(sql, [Search, Search, Search, Search, Search, Search], (err, row) => {                 
@@ -171,6 +172,7 @@ class DBAbstraction {
 		WHERE Project.CompanyID = Company.companyID
 		AND Project.projectID = ProjectDepartment.projectID
 		AND Department.departmentID = ProjectDepartment.departmentID
+		GROUP BY Project.projectID
 		ORDER BY Company.name;
 		;`;
 
@@ -193,6 +195,7 @@ class DBAbstraction {
 		WHERE Project.CompanyID = Company.companyID
 		AND Project.projectID = ProjectDepartment.projectID
 		AND Department.departmentID = ProjectDepartment.departmentID
+		GROUP BY Project.projectID
 		ORDER BY Company.name DESC;
 		;`;
 
@@ -215,6 +218,7 @@ class DBAbstraction {
 		WHERE Project.CompanyID = Company.companyID
 		AND Project.projectID = ProjectDepartment.projectID
 		AND Department.departmentID = ProjectDepartment.departmentID
+		GROUP BY Project.projectID
 		ORDER BY Project.ProjectID
 		;`;
 
@@ -237,6 +241,7 @@ class DBAbstraction {
 		WHERE Project.CompanyID = Company.companyID
 		AND Project.projectID = ProjectDepartment.projectID
 		AND Department.departmentID = ProjectDepartment.departmentID
+		GROUP BY Project.projectID
 		ORDER BY Project.ProjectID DESC
 		;`;
 
@@ -259,6 +264,7 @@ class DBAbstraction {
 		WHERE Project.CompanyID = Company.companyID
 		AND Project.projectID = ProjectDepartment.projectID
 		AND Department.departmentID = ProjectDepartment.departmentID
+		GROUP BY Project.projectID
 		ORDER BY project.pstatus
 		;`;
 
@@ -282,6 +288,7 @@ class DBAbstraction {
 		WHERE Project.CompanyID = Company.companyID
 		AND Project.projectID = ProjectDepartment.projectID
 		AND Department.departmentID = ProjectDepartment.departmentID
+		GROUP BY Project.projectID
 		ORDER BY project.pstatus DESC
 		;`;
 
@@ -306,6 +313,7 @@ class DBAbstraction {
 		WHERE Project.CompanyID = Company.companyID
 		AND Project.projectID = ProjectDepartment.projectID
 		AND Department.departmentID = ProjectDepartment.departmentID
+		GROUP BY Project.projectID
 		ORDER BY Department.depName
 		;`;
 
@@ -328,6 +336,7 @@ class DBAbstraction {
 		WHERE Project.CompanyID = Company.companyID
 		AND Project.projectID = ProjectDepartment.projectID
 		AND Department.departmentID = ProjectDepartment.departmentID
+		GROUP BY Project.projectID
 		ORDER BY Department.depName DESC
 		;`;
 
