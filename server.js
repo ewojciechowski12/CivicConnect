@@ -65,6 +65,11 @@ app.use(express.static(path.join(__dirname, 'Public')));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+handlebars.handlebars.registerHelper('ifEquals', function(arg1, arg2, options) {
+  return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+});
+
+
 // Configure session middleware
 app.use(session({
     secret: 'secret squirrel',
@@ -262,16 +267,12 @@ app.post('/project', async (req, res) => {
       if (!companyID) {
         return res.json({"result": "Failed to find or make company"});
       }
-  
-      var currentDate = new Date(); 
-      var dateTime = currentDate.getFullYear() + " / " 
-          + String(Number(currentDate.getMonth())+1) + " / "
-          + currentDate.getDate()  + " @ "  
-          + currentDate.getHours() + ":"  
-          + currentDate.getMinutes() + ":" 
-          + currentDate.getSeconds();
+
+      var now = new Date();
+      var dateTime = now.toISOString().slice(0,19).replace('T',' ');
+
       await db.insertProject(Description, pStatus, compDate, radio, helpAvail, companyID, dateTime);
-  
+
       const projectID = await db.getProjectID(Description);
       if (!projectID) {
         return res.json({"result": "Failed to find or make Project"});
@@ -283,7 +284,6 @@ app.post('/project', async (req, res) => {
   
       mailer(req.body);
   
-      //res.send('Thank you for your project submission.');
       res.render('thankYou', { layout: 'main', title: 'Thank You'  });
     } catch (error) {
       console.error(error);
@@ -389,25 +389,25 @@ app.post('/project', async (req, res) => {
      }
  });
 
- 
-app.post('/faculty/Search',ensureAuthenticated, async (req, res) => {
-    try {
-      if(req.body.Search == ""){
-          res.redirect('/faculty')
-      }
-      const allProjects = await db.getAllProjectsSearch("%" + req.body.Search + "%");
+ app.get('/faculty/Search', ensureAuthenticated, async (req, res) => {
+  const { Search, startDate, endDate, status } = req.query;
 
-      //Code to display count next to tableheaders
-      const allCount = allProjects.length;
-      const completeCount = allProjects.filter(p => p.pstatus === 'Complete').length;
-      const incompleteCount = allProjects.filter(p => p.pstatus === 'Incomplete').length;
-      const waitingCount = allProjects.filter(p => p.pstatus === 'Waiting').length;
-      const archivedCount = allProjects.filter(p => p.pstatus === 'Archived').length;
+  const allProjects = await db.getAllProjectsFiltered(Search || '', startDate, endDate, status);
 
-      res.render('allProjects', {allCount,completeCount,incompleteCount,waitingCount,archivedCount, projects: allProjects});
-    } catch (err) {
-        res.json({"results": err.message});
-    }
+  const allCount = allProjects.length;
+  const completeCount = allProjects.filter(p => p.pstatus === 'Complete').length;
+  const incompleteCount = allProjects.filter(p => p.pstatus === 'Incomplete').length;
+  const waitingCount = allProjects.filter(p => p.pstatus === 'Waiting').length;
+  const archivedCount = allProjects.filter(p => p.pstatus === 'Archived').length;
+
+  res.render('allProjects', {
+    allCount, completeCount, incompleteCount, waitingCount, archivedCount,
+    projects: allProjects,
+    searchText: Search || '',
+    startDate: startDate || '',
+    endDate: endDate || '',
+    statusFilter: status || ''
+  });
 });
 
 //Function to display all information when id href clicked in /faculty
