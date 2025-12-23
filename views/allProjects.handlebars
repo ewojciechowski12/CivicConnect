@@ -2,41 +2,59 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="/stylesheets/style.css">    
 </head>
-<form action="/faculty/Search" method="post" enctype="application/x-www-form-urlencoded" >
-    <div class="table-header-container">
-        
-        <!-- Table Headers -->
-        <div class="table-container">
-            <table class="table-no-borders">
-                <tr>                    
-                        <th><a href="/faculty" id="allStatus" class="state">All ({{allCount}})</a></th>
-                        <th><a href="/faculty?status=Complete" class="state">Complete ({{completeCount}})</a></th>
-                        <th><a href="/faculty?status=Incomplete" class="state">Incomplete ({{incompleteCount}})</a></th>
-                        <th><a href="/faculty?status=Waiting" class="state">Waiting ({{waitingCount}})</a></th>
-                        <th><a href="/faculty?status=Archived" class="state">Archived ({{archivedCount}})</a></th>
-                    </tr>
-            </table>
-        </div>
+<form action="/faculty/Search" method="get" enctype="application/x-www-form-urlencoded">
+  <div class="table-header-container">
 
-        <!--Button to Add Project Manually (navigates to addProject.handlebars) -->            
-        <div>
-            <button type="button"  class="btn" onclick="location.href='/addProject'">
-                <i class="fas fa-plus"></i> Add Project
-            </button>
-        </div>
-
-        <!-- Search Bar -->
-        <div class="search-container">
-            <input type="text" id="Search" name="Search" tabindex="1">
-            <button type="submit" tabindex="2" class="no-hover">
-                <i class="fas fa-search"></i>
-            </button>
-        </div>
-
+    <!-- Table Headers -->
+    <div class="table-container">
+        <table class="table-no-borders">
+            <tr>                    
+                    <th><a href="/faculty" id="allStatus" class="state">All ({{allCount}})</a></th>
+                    <th><a href="/faculty?status=Complete" class="state">Complete ({{completeCount}})</a></th>
+                    <th><a href="/faculty?status=Incomplete" class="state">Incomplete ({{incompleteCount}})</a></th>
+                    <th><a href="/faculty?status=Waiting" class="state">Waiting ({{waitingCount}})</a></th>
+                    <th><a href="/faculty?status=Archived" class="state">Archived ({{archivedCount}})</a></th>
+                </tr>
+        </table>
     </div>
+
+    <!-- Filter Button -->
+    <div class="filter-dropdown">
+        <button type="button" class="btn" id="filterToggle">
+            <i class="fas fa-filter"></i> Filters
+        </button>
+
+        <div class="filter-menu" id="filterMenu">
+            <div>
+                <label for="Search">Keyword:</label>
+                <input type="text" id="Search" name="Search" value="{{searchText}}">
+            </div>
+            <div>
+                <label for="startDate">Start Date:</label>
+                <input type="date" id="startDate" name="startDate" value="{{startDate}}">
+            </div>
+            <div>
+                <label for="endDate">End Date:</label>
+                <input type="date" id="endDate" name="endDate" value="{{endDate}}">
+            </div>
+            <div>
+                <label for="statusFilter">Status:</label>
+                <select name="status" id="statusFilter">
+                    <option value="" {{#ifEquals statusFilter ""}}selected{{/ifEquals}}>All</option>
+                    <option value="Complete" {{#ifEquals statusFilter "Complete"}}selected{{/ifEquals}}>Complete</option>
+                    <option value="Incomplete" {{#ifEquals statusFilter "Incomplete"}}selected{{/ifEquals}}>Incomplete</option>
+                    <option value="Waiting" {{#ifEquals statusFilter "Waiting"}}selected{{/ifEquals}}>Waiting</option>
+                    <option value="Archived" {{#ifEquals statusFilter "Archived"}}selected{{/ifEquals}}>Archived</option>
+                </select>
+            </div>
+            <div style="margin-top: 8px; display: flex; gap: 8px;">
+                <button type="submit" class="btn">Apply</button>
+                <button type="button" class="btn" id="clearFilters">Clear</button>
+            </div>                
+        </div>
+    </div>
+  </div>
 </form>
-
-
 
 <table class="table-striped table-hover table-interactive" overflow-y="hidden" > 
     <thead>         
@@ -66,13 +84,16 @@
 </table>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', () => {
+    // ------------------------------
+    // URL Parameters & Table Sorting
+    // ------------------------------
     const urlParams = new URLSearchParams(window.location.search);
     const currentStatus = urlParams.get("status");
     const currentSort = urlParams.get("sort") || "date";
     const currentDirection = urlParams.get("direction") || "asc";
 
-    // Handle status highlighting
+    // Highlight current status
     const states = document.querySelectorAll('.state');
     if (!currentStatus) {
         document.getElementById('allStatus').classList.add('selected');
@@ -85,15 +106,15 @@
         });
     }
 
-    // Add selected class on click
+    // Click handler for status links
     states.forEach(state => {
-        state.addEventListener('click', function () {
+        state.addEventListener('click', () => {
             states.forEach(s => s.classList.remove('selected'));
             state.classList.add('selected');
         });
     });
 
-    // Updated: sort links now preserve `status`
+    // Sort links
     document.querySelectorAll(".sortable").forEach(link => {
         link.addEventListener("click", e => {
             e.preventDefault();
@@ -102,12 +123,55 @@
             const newDirection = isSameSort && currentDirection === "asc" ? "desc" : "asc";
 
             let url = `/faculty?sort=${sort}&direction=${newDirection}`;
-            if (currentStatus) {
-                url += `&status=${currentStatus}`;
-            }
+            if (currentStatus) url += `&status=${currentStatus}`;
             window.location.href = url;
         });
     });
+
+    // ------------------------------
+    // Filter Dropdown Positioning
+    // ------------------------------
+    const toggleBtn = document.getElementById('filterToggle');
+    const filterMenu = document.getElementById('filterMenu');
+
+    toggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent immediate closing
+        const rect = toggleBtn.getBoundingClientRect();
+        filterMenu.style.top = rect.bottom + 5 + 'px';  // 5px below button
+        filterMenu.style.right = window.innerWidth - rect.right + 'px';
+        filterMenu.classList.toggle('show');
+    });
+
+    // Close dropdown if clicking outside
+    document.addEventListener('click', (e) => {
+        if (!filterMenu.contains(e.target) && e.target !== toggleBtn) {
+            filterMenu.classList.remove('show');
+        }
+    });
+
+    // ------------------------------
+    // Clear Filters Button
+    // ------------------------------
+    const clearBtn = document.getElementById('clearFilters');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+            document.getElementById('Search').value = '';
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            document.getElementById('statusFilter').selectedIndex = 0;
+
+            const form = document.querySelector('.filter-menu form, form[action="/faculty/Search"]');
+            if (form) form.submit();
+        });
+    }
 });
 
+// Adjusting the position of the filter menu to be aligned with the toggle button
+toggleBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const rect = toggleBtn.getBoundingClientRect();
+    filterMenu.style.top = rect.bottom + 5 + 'px';        
+    filterMenu.style.left = rect.left + 'px';            
+    filterMenu.classList.toggle('show');
+});
 </script>
