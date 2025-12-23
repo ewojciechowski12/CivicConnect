@@ -609,7 +609,7 @@ select {
 }
 
 .trash-btn:hover {
-  color: darkred; /* or any color you prefer */
+  color: darkred; 
   background: none;
 }
 
@@ -644,11 +644,64 @@ select {
 
 .button-group {
   display: flex;
-  justify-content: center; /* center horizontally */
-  align-items: center;     /* center vertically */
+  justify-content: center; 
+  align-items: center;     
   height: 100%;}
 
 .button-group form {
   margin: 0;
   padding: 0;
+}
+/* Filter dropdown button container */
+.filter-dropdown {
+    display: inline-block;
+    position: relative;
+}
+
+/* Filter modal */
+.filter-menu {
+    display: none;
+    position: fixed;          
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 16px;            
+    z-index: 1000;
+    min-width: 240px;         
+    max-width: 280px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    font-size: 1rem;          
+    border-radius: 6px;
+}
+
+/* Show modal */
+.filter-menu.show {
+    display: block;
+}
+
+/* Form elements inside modal */
+.filter-menu label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+/* Inputs and select inside modal */
+.filter-menu input,
+.filter-menu select {
+    width: 100%;
+    padding: 10px 12px;      
+    font-size: 1.25rem;      
+    margin-bottom: 12px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+
+/* Apply & Clear buttons */
+.filter-menu .btn {
+    padding: 10px 16px;     
+    font-size: 1.15rem;     
+    border-radius: 4px;     
+    margin-right: 8px;      
 }
