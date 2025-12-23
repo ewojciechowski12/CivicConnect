@@ -136,33 +136,65 @@ class DBAbstraction {
     	});
 	}
 
-    getAllProjectsSearch(Search)
-    {
-        const sql = `SELECT Company.name, Company.first, Company.last, Project.Description, Project.Date, Project.pstatus, Department.depName, Project.projectID
-		FROM Project, Company, Department, ProjectDepartment
-		WHERE Project.CompanyID = Company.companyID
-		AND Project.projectID = ProjectDepartment.projectID
-		AND Department.departmentID = ProjectDepartment.departmentID
-        AND (
-            Department.depName like ? COLLATE NOCASE
-            OR Project.pstatus like ? COLLATE NOCASE
-            OR Project.Description like ? COLLATE NOCASE
-            OR Company.Name like ? COLLATE NOCASE
-            OR Company.first like ? COLLATE NOCASE
-			OR Project.ProjectID like ? COLLATE NOCASE
-        )
-		GROUP BY Project.projectID;
-        `;
-        return new Promise((resolve, reject) => { 
-            this.db.all(sql, [Search, Search, Search, Search, Search, Search], (err, row) => {                 
-                if(err) { 
-                    reject(err); 
-                } else { 
-                    resolve(row); 
-                } 
-            }); 
-        }); 
-    }
+	getAllProjectsFiltered(keyword, startDate, endDate, status) {
+		// Start building the SQL query
+		let sql = `
+			SELECT Company.name, Company.first, Company.last,
+				Project.Description, Project.Date, Project.pstatus,
+				Department.depName, Project.projectID
+			FROM Project
+			JOIN Company ON Project.CompanyID = Company.companyID
+			JOIN ProjectDepartment ON Project.projectID = ProjectDepartment.projectID
+			JOIN Department ON ProjectDepartment.departmentID = Department.departmentID
+			WHERE 1=1
+		`;
+
+		const params = [];
+
+		// Keyword search (applies to multiple fields)
+		if (keyword) {
+			sql += `
+			AND (
+				Department.depName LIKE ? COLLATE NOCASE
+				OR Project.pstatus LIKE ? COLLATE NOCASE
+				OR Project.Description LIKE ? COLLATE NOCASE
+				OR Company.Name LIKE ? COLLATE NOCASE
+				OR Company.first LIKE ? COLLATE NOCASE
+				OR Project.projectID LIKE ? COLLATE NOCASE
+			)
+			`;
+			const kw = `%${keyword}%`;
+			params.push(kw, kw, kw, kw, kw, kw);
+		}
+
+		// Status filter
+		if (status) {
+			sql += ` AND Project.pstatus = ? `;
+			params.push(status);
+		}
+
+		// Date range filter
+		if (startDate) {
+			sql += ` AND date(substr(Project.Date, 1, 10)) >= date(?) `;
+			params.push(startDate);
+		}
+		if (endDate) {
+			sql += ` AND date(substr(Project.Date, 1, 10)) <= date(?) `;
+			params.push(endDate);
+		}
+
+		sql += ` GROUP BY Project.projectID ORDER BY Project.Date DESC; `;
+
+		return new Promise((resolve, reject) => {
+			this.db.all(sql, params, (err, rows) => {
+				if (err) reject(err);
+				else resolve(rows);
+			});
+		});
+	}
+
+
+
 
 	getAllProjectsSortByCompany()
 	{
