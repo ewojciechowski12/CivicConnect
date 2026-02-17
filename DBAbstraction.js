@@ -136,32 +136,65 @@ class DBAbstraction {
     	});
 	}
 
-    getAllProjectsSearch(Search)
-    {
-        const sql = `SELECT Company.name, Company.first, Company.last, Project.Description, Project.Date, Project.pstatus, Department.depName, Project.projectID
-		FROM Project, Company, Department, ProjectDepartment
-		WHERE Project.CompanyID = Company.companyID
-		AND Project.projectID = ProjectDepartment.projectID
-		AND Department.departmentID = ProjectDepartment.departmentID
-        AND (
-            Department.depName like ? COLLATE NOCASE
-            OR Project.pstatus like ? COLLATE NOCASE
-            OR Project.Description like ? COLLATE NOCASE
-            OR Company.Name like ? COLLATE NOCASE
-            OR Company.first like ? COLLATE NOCASE
-			OR Project.ProjectID like ? COLLATE NOCASE
-        );
-        `;
-        return new Promise((resolve, reject) => { 
-            this.db.all(sql, [Search, Search, Search, Search, Search, Search], (err, row) => {                 
-                if(err) { 
-                    reject(err); 
-                } else { 
-                    resolve(row); 
-                } 
-            }); 
-        }); 
-    }
+	getAllProjectsFiltered(keyword, startDate, endDate, status) {
+		// Start building the SQL query
+		let sql = `
+			SELECT Company.name, Company.first, Company.last,
+				Project.Description, Project.Date, Project.pstatus,
+				Department.depName, Project.projectID
+			FROM Project
+			JOIN Company ON Project.CompanyID = Company.companyID
+			JOIN ProjectDepartment ON Project.projectID = ProjectDepartment.projectID
+			JOIN Department ON ProjectDepartment.departmentID = Department.departmentID
+			WHERE 1=1
+		`;
+
+		const params = [];
+
+		// Keyword search (applies to multiple fields)
+		if (keyword) {
+			sql += `
+			AND (
+				Department.depName LIKE ? COLLATE NOCASE
+				OR Project.pstatus LIKE ? COLLATE NOCASE
+				OR Project.Description LIKE ? COLLATE NOCASE
+				OR Company.Name LIKE ? COLLATE NOCASE
+				OR Company.first LIKE ? COLLATE NOCASE
+				OR Project.projectID LIKE ? COLLATE NOCASE
+			)
+			`;
+			const kw = `%${keyword}%`;
+			params.push(kw, kw, kw, kw, kw, kw);
+		}
+
+		// Status filter
+		if (status) {
+			sql += ` AND Project.pstatus = ? `;
+			params.push(status);
+		}
+
+		// Date range filter
+		if (startDate) {
+			sql += ` AND date(substr(Project.Date, 1, 10)) >= date(?) `;
+			params.push(startDate);
+		}
+		if (endDate) {
+			sql += ` AND date(substr(Project.Date, 1, 10)) <= date(?) `;
+			params.push(endDate);
+		}
+
+		sql += ` GROUP BY Project.projectID ORDER BY Project.Date DESC; `;
+
+		return new Promise((resolve, reject) => {
+			this.db.all(sql, params, (err, rows) => {
+				if (err) reject(err);
+				else resolve(rows);
+			});
+		});
+	}
+
+
+
 
 	getAllProjectsSortByCompany()
 	{
@@ -171,6 +204,7 @@ class DBAbstraction {
 		WHERE Project.CompanyID = Company.companyID
 		AND Project.projectID = ProjectDepartment.projectID
 		AND Department.departmentID = ProjectDepartment.departmentID
+		GROUP BY Project.projectID
 		ORDER BY Company.name;
 		;`;
 
@@ -193,6 +227,7 @@ class DBAbstraction {
 		WHERE Project.CompanyID = Company.companyID
 		AND Project.projectID = ProjectDepartment.projectID
 		AND Department.departmentID = ProjectDepartment.departmentID
+		GROUP BY Project.projectID
 		ORDER BY Company.name DESC;
 		;`;
 
@@ -215,6 +250,7 @@ class DBAbstraction {
 		WHERE Project.CompanyID = Company.companyID
 		AND Project.projectID = ProjectDepartment.projectID
 		AND Department.departmentID = ProjectDepartment.departmentID
+		GROUP BY Project.projectID
 		ORDER BY Project.ProjectID
 		;`;
 
@@ -237,6 +273,7 @@ class DBAbstraction {
 		WHERE Project.CompanyID = Company.companyID
 		AND Project.projectID = ProjectDepartment.projectID
 		AND Department.departmentID = ProjectDepartment.departmentID
+		GROUP BY Project.projectID
 		ORDER BY Project.ProjectID DESC
 		;`;
 
@@ -259,6 +296,7 @@ class DBAbstraction {
 		WHERE Project.CompanyID = Company.companyID
 		AND Project.projectID = ProjectDepartment.projectID
 		AND Department.departmentID = ProjectDepartment.departmentID
+		GROUP BY Project.projectID
 		ORDER BY project.pstatus
 		;`;
 
@@ -282,6 +320,7 @@ class DBAbstraction {
 		WHERE Project.CompanyID = Company.companyID
 		AND Project.projectID = ProjectDepartment.projectID
 		AND Department.departmentID = ProjectDepartment.departmentID
+		GROUP BY Project.projectID
 		ORDER BY project.pstatus DESC
 		;`;
 
@@ -306,6 +345,7 @@ class DBAbstraction {
 		WHERE Project.CompanyID = Company.companyID
 		AND Project.projectID = ProjectDepartment.projectID
 		AND Department.departmentID = ProjectDepartment.departmentID
+		GROUP BY Project.projectID
 		ORDER BY Department.depName
 		;`;
 
@@ -328,6 +368,7 @@ class DBAbstraction {
 		WHERE Project.CompanyID = Company.companyID
 		AND Project.projectID = ProjectDepartment.projectID
 		AND Department.departmentID = ProjectDepartment.departmentID
+		GROUP BY Project.projectID
 		ORDER BY Department.depName DESC
 		;`;
 
@@ -349,7 +390,7 @@ class DBAbstraction {
         }
 		 
     	const sql = `
-		SELECT Project.projectID, Project.Description, Project.pstatus, Project.TimeLine, Project.Date, Project.radio, Project.helpAvail, Company.name, Company.street, Company.city, Company.state, Company.zip, Company.first, Company.last, Company.phone, Company.email, Company.companyWeb, Department.depName, Department.head, Department.depEmail
+		SELECT Project.projectID, Project.Description, Project.pstatus, Project.TimeLine, Project.Date, Project.radio, Project.helpAvail, Company.name, Company.street, Company.city, Company.state, Company.zip, Company.first, Company.last, Company.phone, Company.email, Company.companyWeb, Department.depName, Department.head, Department.depEmail, Department.departmentID
 		FROM Project, Company, Department, ProjectDepartment
 		WHERE Project.CompanyID = Company.companyID 
 		AND Project.projectID = ?
@@ -366,24 +407,19 @@ class DBAbstraction {
             	}
         	});
     	});
-	}
+	}	
 
-	updateProjectStatus(proID)
+	updateProjectStatus(pStatus, proID)
     {
    	 const sql = `
    	 UPDATE Project
-   	 SET pstatus =
-   	 CASE
-   	 WHEN pstatus = 'Incomplete' THEN 'Complete'
-   	 WHEN pstatus = 'Waiting' THEN 'Incomplete'
-   	 WHEN pstatus = 'Complete' THEN 'Waiting'
-   	 ELSE 'Waiting' END
+   	 SET pstatus = ?   	 
    	 WHERE projectID = ? COLLATE NOCASE;
    	 `;
 
     
    	 return new Promise((resolve, reject) => {
-   		 this.db.run(sql, [proID], (err) => {            	 
+   		 this.db.run(sql, [pStatus, proID], (err) => {            	 
             	if(err) {
                 	reject(err);
             	} else {
@@ -415,17 +451,16 @@ class DBAbstraction {
 
     }
 
-	deleteProjectDep(proID, depName)
+	deleteProjectDep(proID, depID)
     {
    	 const sql = `
-   		DELETE ProjectDepartment
-		FROM ProjectDepartment 
-		WHERE projectID = ? COLLATE NOCASE
-		AND departmentID = ? COLLATE NOCASE;
+   		DELETE FROM ProjectDepartment 
+		WHERE ProjectDepartment.projectID = ? COLLATE NOCASE
+		AND ProjectDepartment.departmentID = ? COLLATE NOCASE;
    	 `;
 
    	 return new Promise((resolve, reject) => {
-   		 this.db.run(sql, [proID, depName], (err) => {            	 
+   		 this.db.run(sql, [proID, depID], (err) => {            	 
             	if(err) {
                 	reject(err);
             	} else {
@@ -763,6 +798,42 @@ deleteUnusedCompany()
         	});
     	});
 	}
+
+	//Verify that Department Exists
+	getDepartmentIDbyID(id) {
+		const sql = `
+			SELECT Department.departmentID
+			from Department
+			WHERE Department.departmentID = ?;
+		`;
+
+		return new Promise((resolve, reject) => {
+			this.db.get(sql, [name], (err, row) => {
+				if (err) {
+					reject(err);
+				} else {
+					resolve(row ? row.companyID : null);
+				}
+			});
+		});
+	}
+
+	getAllDepartments(){
+		const sql=`
+		SELECT Department.departmentID, Department.depName
+		from Department`
+
+		return new Promise((resolve, reject) => {
+        	this.db.all(sql, [], (err, row) => {
+            	if(err) {					
+                	reject(err);
+            	} else {
+                	resolve(row);
+            	}
+        	});
+    	});
+	}	
+	
 
 }
 module.exports = DBAbstraction;

@@ -65,6 +65,11 @@ app.use(express.static(path.join(__dirname, 'Public')));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+handlebars.handlebars.registerHelper('ifEquals', function(arg1, arg2, options) {
+  return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+});
+
+
 // Configure session middleware
 app.use(session({
     secret: 'secret squirrel',
@@ -96,20 +101,29 @@ passport.use(new OneLoginStrategy({
   app.use(passport.initialize());
   app.use(passport.session());
   
+  
   // Middleware to check authentication
   function ensureAuthenticated(req, res, next) {
+    if (process.env.NODE_ENV === 'development') {
+      // Simulate a logged-in user
+      req.user = { name: 'Dev User', email: 'dev@example.com' };
+      return next();
+    }
+  
     if (req.isAuthenticated()) {
       return next();
     }
-    res.redirect('/home');
+    res.redirect('/login');
   }
 
 function addresses(ids){
   var email = "";
-  for (var i = 0; i < ids.length; i++) {
-    email += emailAddresses[ids[i] - 1];
-    if(i < ids.length - 1){
-      email+=  ", ";
+  if(ids && ids.length > 0){
+    for (var i = 0; i < ids.length; i++) {
+      email += emailAddresses[ids[i] - 1];
+      if(i < ids.length - 1){
+        email+=  ", ";
+      }
     }
   }
   return email;
@@ -143,7 +157,7 @@ async function mailer(bodyParser) {
       rejectUnauthorized:false
     }
   });
-  var emails = addresses(bodyParser.multipleDrop);
+  var emails = addresses(bodyParser.department);
 
   // setup email data with unicode symbols
   let mailOptions = {
@@ -192,7 +206,7 @@ app.get('/', function(req, res, next) {
 
 /* GET home page. */
 app.get('/home', function(req, res, next) {
-    res.render('index', { title: 'Civic Connect Login' });
+    res.render('form', { layout: false });
   });
 
 // Login route
@@ -205,7 +219,7 @@ app.get('/login', passport.authenticate('openidconnect', {
 app.get('/oauth/callback', passport.authenticate('openidconnect', {
     callback: true,
     successReturnToOrRedirect: '/faculty', // Redirect to faculty page after successful login
-    failureRedirect: '/home'
+    failureRedirect: '/login'
   }));
 
 
@@ -219,7 +233,7 @@ app.get('/logout', function(req, res) {
             return res.status(500).send('Error logging out');
         }
         // Successful logout
-        res.redirect('/home'); // Redirect to homepage or wherever you want
+        res.redirect('/login'); // Redirect to login
     });
 });
 
@@ -233,12 +247,13 @@ app.post('/project', async (req, res) => {
     const state = req.body.state;
     const radio = req.body.radio;
     const OrgName = req.body.OrgName;
-    const Comp = req.body.Comp;
+    const compDate = req.body.compDate;
     const streetAddr = req.body.streetAddr;
     const zip = req.body.zip;
     const helpAvail = req.body.helpAvail;
     const Description = req.body.Description;
-    const depart = req.body.multipleDrop;
+    const depart = req.body.department;
+    const pStatus = req.body.pStatus || "Waiting"; // default to "Waiting" if not provided
   
     try {
       await db.insertCompany(OrgName, streetAddr, cityTown, state, zip, fName, lName, pNumber, email, OrgSite);
@@ -246,16 +261,12 @@ app.post('/project', async (req, res) => {
       if (!companyID) {
         return res.json({"result": "Failed to find or make company"});
       }
-  
-      var currentDate = new Date(); 
-      var dateTime = currentDate.getFullYear() + " / " 
-          + String(Number(currentDate.getMonth())+1) + " / "
-          + currentDate.getDate()  + " @ "  
-          + currentDate.getHours() + ":"  
-          + currentDate.getMinutes() + ":" 
-          + currentDate.getSeconds();
-      await db.insertProject(Description, "Waiting", Comp, radio, helpAvail, companyID, dateTime);
-  
+
+      var now = new Date();
+      var dateTime = now.toISOString().slice(0,19).replace('T',' ');
+
+      await db.insertProject(Description, pStatus, compDate, radio, helpAvail, companyID, dateTime);
+
       const projectID = await db.getProjectID(Description);
       if (!projectID) {
         return res.json({"result": "Failed to find or make Project"});
@@ -267,198 +278,153 @@ app.post('/project', async (req, res) => {
   
       mailer(req.body);
   
-      res.send('Thank you for your project submission.');
+      res.render('thankYou', { layout: 'main', title: 'Thank You'  });
     } catch (error) {
       console.error(error);
       res.status(500).send('Internal Server Error');
     }
   });
 
-app.get('/faculty', ensureAuthenticated, async (req, res) => {
+  app.get('/faculty', ensureAuthenticated, async (req, res) => {
 	 
-   try {
-	    const allProjects = await db.getAllProjectsReverseSortByDate();
-
-      //Code to display count next to th on /faculty
-      const allCount = allProjects.length;
-      const completeCount = allProjects.filter(p => p.pstatus === 'Complete').length;
-      const incompleteCount = allProjects.filter(p => p.pstatus === 'Incomplete').length;
-      const waitingCount = allProjects.filter(p => p.pstatus === 'Waiting').length;
-
-      sortDate = true;
-
-	    if(allProjects) {
-        	res.render('leftHandTable', {allCount,completeCount,incompleteCount,waitingCount,projects: allProjects});
-          
-	    } else {
-        	res.json({"results": "none"});
-	    }
-    } catch (err) {
-	    res.json({"results": err.message});
-    }
-});
-
-app.post('/faculty/Search',ensureAuthenticated, async (req, res) => {
     try {
-        if(req.body.Search == ""){
-            res.redirect('/faculty')
-        }
-        const allProjects = await db.getAllProjectsSearch("%" + req.body.Search + "%");
-        res.render('leftHandTable', {projects: allProjects});        
-    } catch (err) {
-        res.json({"results": err.message});
-    }
+       //const allProjects = await db.getAllProjectsReverseSortByDate();
+       let allProjects = [];
+       const sortBy = req.query.sort || 'date'; // Default to sorting by date
+       const direction = req.query.direction === 'asc' ? 'asc' : 'desc'; // default to 'desc'
+       const status = req.query.status;   
 
-//First draft of a get function for generating and populating the left-hand table in faculty.html. still unsure of how to call this function from the html file itself, or if im supposed to be doing that in the first place
-});
+       switch(sortBy){
 
-app.get('/faculty/company', ensureAuthenticated, async (req, res) => {
-	 
-  try {
-    var allProjects;
-    if(sortComp){
-        allProjects = await db.getAllProjectsReverseSortByCompany();
-        sortComp = false;
-    }
-    else{
-        allProjects = await db.getAllProjectsSortByCompany();
-        sortComp = true;
-        sortDate = false;
-        sortStat = false;
-        sortDep = false;
-    }
- if(allProjects) {
-     res.render('leftHandTable', {projects: allProjects});
- } else {
-     res.json({"results": "none"});
- }
-} catch (err) {
- res.json({"results": "error"});
-}
+        case 'date':
+          allProjects = direction === 'asc'
+            ? await db.getAllProjectsSortByDate()
+            : await db.getAllProjectsReverseSortByDate();
+          break;
 
-//Function to sort table by date in when date href clicked on /faculty
-});
+        case 'company':
+          if(sortComp){
+            allProjects = await db.getAllProjectsReverseSortByCompany();
+            sortComp = false;
+            break;
+          }
+          else{
+              allProjects = await db.getAllProjectsSortByCompany();
+              sortComp = true;
+              sortDate = false;
+              sortStat = false;
+              sortDep = false;
+              break;
+          }
 
-app.get('/faculty/date', ensureAuthenticated, async (req, res) => {
-	 
-  try {
-    var allProjects;
-    if(!sortDate){
-        allProjects = await db.getAllProjectsReverseSortByDate();
-        sortDate = true;
-    }
-    else{
-        allProjects = await db.getAllProjectsSortByDate();
-        sortComp = false;
-        sortDate = false;
-        sortStat = false;
-        sortDep = false;
-    }
-if(allProjects) {
-     res.render('leftHandTable', {projects: allProjects});
- } else {
-     res.json({"results": "none"});
- }
-} catch (err) {
- res.json({"results": "error"});
-}
+        case 'status':
+          
+          if(!status){
+            if(sortStat){
+                allProjects = await db.getAllProjectsReverseSortByStatus();
+                sortStat = false;
+                break;
+            }
+            else{
+                allProjects = await db.getAllProjectsSortByStatus();
+                sortComp = false;
+                sortDate = false;
+                sortStat = true;
+                sortDep = false;
+                break;
+            }
+          } else {      
+            allProjects = await db.getProjectByStatus(status);
+            break;      
+          }
 
-//Function to sort table by status when status href clicked on /faculty
-});
+        case 'department':
+          if(sortDep){
+            allProjects = await db.getAllProjectsReverseSortByDepartment();
+            sortDep = false;
+            break;
+          }
+          else{
+              allProjects = await db.getAllProjectsSortByDepartment();
+              sortComp = false;
+              sortDate = false;
+              sortStat = false;
+              sortDep = true;
+              break;
+          }
 
-app.get('/faculty/status', ensureAuthenticated, async (req, res) => {
-	 
-  try {    
+        default:
+          //allProjects = await db.getAllProjectsSortByDate();
+          break;
+      }   
+      
+       //Code to display count next to tableheaders on /faculty
+       const allCount = allProjects.length;
+       const completeCount = allProjects.filter(p => p.pstatus === 'Complete').length;
+       const incompleteCount = allProjects.filter(p => p.pstatus === 'Incomplete').length;
+       const waitingCount = allProjects.filter(p => p.pstatus === 'Waiting').length;
+       const archivedCount = allProjects.filter(p => p.pstatus === 'Archived').length;
+      
+       const filteredProj = (!status || status === 'All')
+       ? allProjects
+       : allProjects.filter(p => p.pstatus === status);
 
-    var allProjects;
-    const status = req.query.status;    
+       
+       sortDate = true;
+ 
+       if(filteredProj && filteredProj.length > 0) {
+           res.render('allProjects', {allCount,completeCount,incompleteCount,waitingCount,archivedCount, projects: filteredProj});
+           
+       } else {
+           res.json({"results": "no projects"});
+       }
+     } catch (err) {
+       res.json({"results": err.message});
+     }
+ });
 
-    if(!status){
-      if(sortStat){
-          allProjects = await db.getAllProjectsReverseSortByStatus();
-          sortStat = false;
-      }
-      else{
-          allProjects = await db.getAllProjectsSortByStatus();
-          sortComp = false;
-          sortDate = false;
-          sortStat = true;
-          sortDep = false;
-      }
-    } else {      
-      allProjects = await db.getProjectByStatus(status);      
-    }  
+ app.get('/faculty/Search', ensureAuthenticated, async (req, res) => {
+  const { Search, startDate, endDate, status } = req.query;
 
-    //Code to display count next to th on /faculty
-    const allCount = allProjects.length;    
-    const completeCount = allProjects.filter(p => p.pstatus === 'Complete').length;
-    const incompleteCount = allProjects.filter(p => p.pstatus === 'Incomplete').length;
-    const waitingCount = allProjects.filter(p => p.pstatus === 'Waiting').length;
-    
-    if(allProjects && allProjects.length > 0) {
-      res.render('leftHandTable', {
-        projects: allProjects, 
-        currentStatus: status,
-        allCount,
-        completeCount,
-        incompleteCount,
-        waitingCount
-      });
-    } else {
-        res.json({"results": "none"});
-    }
-  } catch (err) {    
-  res.json({"results": "error"});
-}
+  const allProjects = await db.getAllProjectsFiltered(Search || '', startDate, endDate, status);
 
-});
+  const allCount = allProjects.length;
+  const completeCount = allProjects.filter(p => p.pstatus === 'Complete').length;
+  const incompleteCount = allProjects.filter(p => p.pstatus === 'Incomplete').length;
+  const waitingCount = allProjects.filter(p => p.pstatus === 'Waiting').length;
+  const archivedCount = allProjects.filter(p => p.pstatus === 'Archived').length;
 
-//Function to sort table by department when department href clicked on /faculty
-app.get('/faculty/department', ensureAuthenticated, async (req, res) => {
-	 
-  try {
-    var allProjects;
-    if(sortDep){
-        allProjects = await db.getAllProjectsReverseSortByDepartment();
-        sortDep = false;
-    }
-    else{
-        allProjects = await db.getAllProjectsSortByDepartment();
-        sortComp = false;
-        sortDate = false;
-        sortStat = false;
-        sortDep = true;
-    }
- if(allProjects) {
-     res.render('leftHandTable', {projects: allProjects});
- } else {
-     res.json({"results": "none"});
- }
-} catch (err) {
- res.json({"results": "error"});
-}
+  res.render('allProjects', {
+    allCount, completeCount, incompleteCount, waitingCount, archivedCount,
+    projects: allProjects,
+    searchText: Search || '',
+    startDate: startDate || '',
+    endDate: endDate || '',
+    statusFilter: status || ''
+  });
 });
 
 //Function to display all information when id href clicked in /faculty
 app.get('/allinformation/:projectid', ensureAuthenticated, async (req, res) => {
 	try {
         
-    	const projectInfo = await db.getAllInformationByProjectID(Number(req.params.projectid));
+    	const projectInfo = await db.getAllInformationByProjectID(Number(req.params.projectid));      
+      const departments = await db.getAllDepartments();
+
     	if(projectInfo) {
-        res.render('allInfoTable', {information: projectInfo});
+        res.render('projectInformation', {departments, information: projectInfo });
     	} else {
-        	res.json({"results": "none"});
+        res.json({"results": "no project with id " + req.params.projectid});
     	}
 	} catch (err) {
     	res.json({"results": "error"});
 	}
-
   
 });
-//first draft of a get function for generating a table on the right-hand side of faculty.html with all the information about a project based on what project you clicked from the left-hand table
-app.get('/allinformation/statusupdate/:projectid', ensureAuthenticated, async (req, res) => {
+
+app.post('/allinformation/statusupdate/:projectid', ensureAuthenticated, async (req, res) => {
   try {
-	await db.updateProjectStatus(Number(req.params.projectid));
+	await db.updateProjectStatus(req.body.pStatus,Number(req.params.projectid));
 
   } catch (err) {
 	res.json({"results": "error"});
@@ -466,7 +432,7 @@ app.get('/allinformation/statusupdate/:projectid', ensureAuthenticated, async (r
   res.redirect('/allinformation/' + req.params.projectid);
 });
 
-app.get('/allinformation/delete/:projectid', ensureAuthenticated, async(req, res) => {
+app.post('/allinformation/delete/:projectid', ensureAuthenticated, async(req, res) => {
   try {
     
       // Use projectIdToDelete to delete the project from your database
@@ -482,24 +448,116 @@ app.get('/allinformation/delete/:projectid', ensureAuthenticated, async(req, res
   }
 });
 
-app.get('/allinformation/deleteDep/:projectid/:depName', ensureAuthenticated, async(req, res) => {
+//Remove Department From Project
+app.post('/allinformation/deleteDep/:projectid', ensureAuthenticated, async(req, res) => {
   try {
+    
+    const { departmentID } = req.body;
 
-    var depID = db.getDepartmentID(req.params.depName);
-
-    if(depID){
-      // Use projectIdToDelete to delete the project from your database
-      await db.deleteProjectDep(Number(req.params.projectid), depID);
-      // Redirect to the desired page after successful deletion
-      res.redirect(`/allinformation/${req.params.projectid}`); // Adjust the redirect URL as needed
+    if(!departmentID){
+      return res.status(400).json({ error: 'Department ID required' });
     }
+
+    const projectID = req.params.projectid;
+    const result = await db.deleteProjectDep(projectID, departmentID);
+    
+
+    res.redirect(`/allinformation/${projectID}`);
+
+    //res.json({ message: 'Department removed from project', changes: result });
       
   } catch (error) {
       // Handle any errors that occur during deletion
-      console.error('Error deleting project:', error);
+      console.error('Error deleting department:', error);
       res.status(500).send('Internal Server Error'); // Respond with an appropriate error message
   }
 });
+
+// Add department to project that is already created
+app.post('/allinformation/addDep/:projectid', ensureAuthenticated, async(req, res) => {
+  try {
+    
+    //var depID = db.getDepartmentID(req.params.depName);
+    const { departmentID } = req.body;
+
+    if(!departmentID){
+      return res.status(400).json({ error: 'Department ID required' });
+    }
+
+    const projectID = req.params.projectid;
+    const result = await db.deleteProjectDep(projectID, departmentID);
+    await db.insertProjectDepartment(departmentID, projectID);
+
+    res.redirect(`/allinformation/${projectID}`);    
+      
+  } catch (error) {
+      // Handle any errors that occur during deletion
+      console.error('Error adding department:', error);
+      res.status(500).send('Internal Server Error'); // Respond with an appropriate error message
+  }
+});
+
+// Page for faculty to manually add project
+app.get('/addProject', ensureAuthenticated, (req, res) => {
+  res.render('addProject'); 
+});
+
+app.get('/thankYou',(req, res) => {
+  res.render('thankYou', { layout: 'main', title: 'Thank You'  });
+});
+
+// Push project to database from /addProject
+app.post('/addProject', async (req, res) => {
+  const {
+    fname,
+    lname,
+    email,
+    cityTown,    
+    state,    
+    OrgName,    
+    streetAddr,
+    zip,    
+    Description,
+    department,
+    pStatus,
+    pNumber,
+    OrgSite,
+    compDate
+  } = req.body;
+
+  try {
+    // Insert new company or find existing one
+    await db.insertCompany(OrgName, streetAddr, cityTown, state, zip, fname, lname, pNumber, email, OrgSite);
+    const companyID = await db.getCompanyID(OrgName, fname, lname);
+
+    if (!companyID) {
+      return res.status(400).json({ result: 'Failed to find or make company' });
+    }
+
+    // Get current date/time
+    const currentDate = new Date();
+    const dateTime = `${currentDate.getFullYear()} / ${currentDate.getMonth() + 1} / ${currentDate.getDate()} @ ${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}`;
+
+    // Insert new project
+    await db.insertProject(Description, pStatus, compDate, radio, helpAvail, companyID, dateTime);
+    const projectID = await db.getProjectID(Description);
+
+    if (!projectID) {
+      return res.status(400).json({ result: 'Failed to find or make Project' });
+    }
+
+    // Associate departments
+    for (let i = 0; i < department.length; i++) {
+      await db.insertProjectDepartment(department[i], projectID);
+    }
+
+    res.json({ result: 'Project successfully submitted' });
+  } catch (error) {
+    console.error('Error in /addProject:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
  
 app.use((req, res) => {
 	res.status(404).send(`<h2>Uh Oh!</h2><p>Sorry ${req.url} cannot be found here</p>`);
