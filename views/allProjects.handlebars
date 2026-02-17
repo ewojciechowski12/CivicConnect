@@ -18,41 +18,50 @@
         </table>
     </div>
 
-    <!-- Filter Button -->
-    <div class="filter-dropdown">
-        <button type="button" class="btn" id="filterToggle">
-            <i class="fas fa-filter"></i> Filters
+    <div style="display: flex; gap: 8px; align-items: center;">
+        <!-- Add project button -->     
+        <button type="button"  class="btn" onclick="location.href='/addProject'">
+            <i class="fas fa-plus"></i> Add Project
         </button>
+        
 
-        <div class="filter-menu" id="filterMenu">
-            <div>
-                <label for="Search">Keyword:</label>
-                <input type="text" id="Search" name="Search" value="{{searchText}}">
+        <!-- Filter Button -->
+        <div class="filter-dropdown">
+            <button type="button" class="btn" id="filterToggle">
+                <i class="fas fa-filter"></i> Filters
+            </button>
+
+            <div class="filter-menu" id="filterMenu">
+                <div>
+                    <label for="Search">Keyword:</label>
+                    <input type="text" id="Search" name="Search" value="{{searchText}}">
+                </div>
+                <div>
+                    <label for="startDate">Start Date:</label>
+                    <input type="date" id="startDate" name="startDate" value="{{startDate}}">
+                </div>
+                <div>
+                    <label for="endDate">End Date:</label>
+                    <input type="date" id="endDate" name="endDate" value="{{endDate}}">
+                </div>
+                <div>
+                    <label for="statusFilter">Status:</label>
+                    <select name="status" id="statusFilter">
+                        <option value="" {{#ifEquals statusFilter ""}}selected{{/ifEquals}}>All</option>
+                        <option value="Complete" {{#ifEquals statusFilter "Complete"}}selected{{/ifEquals}}>Complete</option>
+                        <option value="Incomplete" {{#ifEquals statusFilter "Incomplete"}}selected{{/ifEquals}}>Incomplete</option>
+                        <option value="Waiting" {{#ifEquals statusFilter "Waiting"}}selected{{/ifEquals}}>Waiting</option>
+                        <option value="Archived" {{#ifEquals statusFilter "Archived"}}selected{{/ifEquals}}>Archived</option>
+                    </select>
+                </div>
+                <div style="margin-top: 8px; display: flex; gap: 8px;">
+                    <button type="submit" class="btn">Apply</button>
+                    <button type="button" class="btn" id="clearFilters">Clear</button>
+                </div>                
             </div>
-            <div>
-                <label for="startDate">Start Date:</label>
-                <input type="date" id="startDate" name="startDate" value="{{startDate}}">
-            </div>
-            <div>
-                <label for="endDate">End Date:</label>
-                <input type="date" id="endDate" name="endDate" value="{{endDate}}">
-            </div>
-            <div>
-                <label for="statusFilter">Status:</label>
-                <select name="status" id="statusFilter">
-                    <option value="" {{#ifEquals statusFilter ""}}selected{{/ifEquals}}>All</option>
-                    <option value="Complete" {{#ifEquals statusFilter "Complete"}}selected{{/ifEquals}}>Complete</option>
-                    <option value="Incomplete" {{#ifEquals statusFilter "Incomplete"}}selected{{/ifEquals}}>Incomplete</option>
-                    <option value="Waiting" {{#ifEquals statusFilter "Waiting"}}selected{{/ifEquals}}>Waiting</option>
-                    <option value="Archived" {{#ifEquals statusFilter "Archived"}}selected{{/ifEquals}}>Archived</option>
-                </select>
-            </div>
-            <div style="margin-top: 8px; display: flex; gap: 8px;">
-                <button type="submit" class="btn">Apply</button>
-                <button type="button" class="btn" id="clearFilters">Clear</button>
-            </div>                
         </div>
     </div>
+    
   </div>
 </form>
 
@@ -166,12 +175,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Adjusting the position of the filter menu to be aligned with the toggle button
-toggleBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const rect = toggleBtn.getBoundingClientRect();
-    filterMenu.style.top = rect.bottom + 5 + 'px';        
-    filterMenu.style.left = rect.left + 'px';            
-    filterMenu.classList.toggle('show');
-});
 </script>
