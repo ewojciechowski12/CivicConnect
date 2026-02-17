@@ -101,6 +101,7 @@ passport.use(new OneLoginStrategy({
   app.use(passport.initialize());
   app.use(passport.session());
   
+  
   // Middleware to check authentication
   function ensureAuthenticated(req, res, next) {
     if (process.env.NODE_ENV === 'development') {
@@ -114,13 +115,6 @@ passport.use(new OneLoginStrategy({
     }
     res.redirect('/login');
   }
-  
-  /*function ensureAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
-      return next();
-    }
-    res.redirect('/login');
-  }*/
 
 function addresses(ids){
   var email = "";
