@@ -63,12 +63,6 @@
   overflow-x: hidden;
 }
 
-/* Description Text */
-.description {
-  font-size: 23px;
-  font-family: Helvetica, sans-serif;
-}
-
 input[type=submit] {
     background-color: rgb(238, 42, 55);
     border: none;
@@ -92,34 +86,19 @@ input:hover[type=submit] {
   margin: 8px 0;
   box-sizing: border-box;
 }
-
-.length1 {
-  width: 40%;
-  padding: 7px 20px;
-  margin: 8px 0;
-  box-sizing: border-box;
-}
-
-.length2 {
-  width: 60%;
-  padding: 7px 20px;
-  margin: 8px 0;
-  box-sizing: border-box;
-}
-
-.length3 {
-  width: 75%;
-  padding: 7px 20px;
-  margin: 8px 0;
-  box-sizing: border-box;
-}
-
+/*
 .label-style {
   font-size: 17px;
   font-family: Helvetica, sans-serif;
   display: block;
   padding-top: 10px;
 }
+.label-style{
+  font-weight: bold;
+  margin-bottom: 10px;
+  display: inline-block;
+  font-size: 2rem;
+}*/
 
 .col1 {
     -ms-flex: 25%; /* IE10 */
@@ -151,8 +130,8 @@ input:hover[type=submit] {
 } 
 
 .btn {
-    background-color: rgb(238, 42, 55);
-    color:white;
+  background-color: rgb(238, 42, 55);
+  color: white;  
 }
 
 .row {
@@ -194,6 +173,7 @@ input:hover[type=submit] {
 
 #myInput:focus {outline: 3px solid #ddd;}
 
+/*possible deletion of dropdown class if no other occurence besides form.handlebars*/
 .dropdown {
     position: relative;
     display: inline-block;
@@ -367,18 +347,6 @@ height: 20px;
   background: white;
 }
 
-.description {
-  font-family: Helvetica, sans-serif;
-  font-size: 14px;
-}
-
-.lastFormElems {
-  margin: 0 auto;
-  margin-left: 15px;
-  text-align: left;
-  margin-right: 8px;
-}
-
 .descrip-text {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -396,7 +364,6 @@ tr{
 }
 .state.selected{
   color: rgb(238, 42, 55); /* Change link color to blue when hovered */
-  /*text-decoration: underline; /* Add an underline when hovered */
 }
 th a, th{
   color:#888;
@@ -542,4 +509,199 @@ text-align: left;
 .table-striped th, .table-striped td {
   padding: 10px;
   border: 1px solid #ddd;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f7f8;
+  padding: 20px;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 40px;
+  font-size: 2.5rem;
+  color: #333;
+}
+
+.basic-form {
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+label {
+  font-weight: bold;
+  margin-bottom: 10px;
+  display: inline-block;
+  font-size: 2rem;
+}
+
+input, textarea, select {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 2rem;
+}
+
+input[type="text"], input[type="email"], select {
+  background-color: #f9f9f9;
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.form-submit {
+  background-color: rgb(238, 42, 55);
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 2rem;
+  width: 100%;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: rgb(169, 36, 45);
+}
+
+/*Class for buttons with no boackground when hovered (search bar icon)*/
+.no-hover:hover {
+  background-color: transparent !important;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+select {
+  background-color: lightgrey;
+}
+
+/* Customizing the dropdown button for select */
+.dropdown-toggle {
+  background-color: lightgrey;
+  color: black;
+}
+
+.trash-btn {
+  background: none;
+  border: none;
+  color: red;
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  transition: color 0.3s ease;
+}
+
+.trash-btn:hover {
+  color: darkred; 
+  background: none;
+}
+
+
+/* Icon tweak */
+.trash-btn i, .add-btn i {
+  position: relative;
+  top: 1px;
+  
+}
+
+.icon-form {
+  display: inline-block;
+  margin: 0;
+}
+
+.add-btn {
+  background: none;
+  border: none;
+  color: #28a745;  
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-btn:hover {
+  color: darkgreen;
+  background: none;
+}
+
+.button-group {
+  display: flex;
+  justify-content: center; 
+  align-items: center;     
+  height: 100%;}
+
+.button-group form {
+  margin: 0;
+  padding: 0;
+}
+/* Filter dropdown button container */
+.filter-dropdown {
+    display: inline-block;
+    position: relative;
+}
+
+/* Filter modal */
+.filter-menu {
+    display: none;
+    position: fixed;          
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 16px;            
+    z-index: 1000;
+    min-width: 240px;         
+    max-width: 280px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    font-size: 1rem;          
+    border-radius: 6px;
+}
+
+/* Show modal */
+.filter-menu.show {
+    display: block;
+}
+
+/* Form elements inside modal */
+.filter-menu label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+/* Inputs and select inside modal */
+.filter-menu input,
+.filter-menu select {
+    width: 100%;
+    padding: 10px 12px;      
+    font-size: 1.25rem;      
+    margin-bottom: 12px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+
+/* Apply & Clear buttons */
+.filter-menu .btn {
+    padding: 10px 16px;     
+    font-size: 1.15rem;     
+    border-radius: 4px;     
+    margin-right: 8px;      
 }
