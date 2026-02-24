@@ -49,6 +49,8 @@ const { date } = require('assert-plus');
 require('dotenv').config();
 const router = express.Router();
 
+const USE_DEMO_AUTH = true; //TO DO - set false before production
+
 const app = express(); 
 //let transporter = nodemailer.createTransport(options[, defaults])
 const handlebars = require('express-handlebars').create({defaultLayout: 'main'});
@@ -100,21 +102,62 @@ passport.use(new OneLoginStrategy({
   // Initialize Passport middleware
   app.use(passport.initialize());
   app.use(passport.session());
+
+// ─────────────────────────────────────────────────────────────
+//  DEMO AUTHENTICATION SETUP
+// ─────────────────────────────────────────────────────────────
+let ensureAuthenticated;
+
+if (USE_DEMO_AUTH) {
+  // DEMO AUTH - Remove before production
+  const { setupDemoAuth, demoAuthMiddleware } = require('./demoAuth');
+  setupDemoAuth(app);
   
+  ensureAuthenticated = function(req, res, next) {
+    return demoAuthMiddleware(req, res, next);
+  };
   
-  // Middleware to check authentication
+  console.log('⚠️  RUNNING IN DEMO AUTH MODE - NOT FOR PRODUCTION ⚠️');
+} else {
+  // PRODUCTION AUTH - OneLogin OIDC
+  const passport = require('passport');
+  const OpenIDConnectStrategy = require('passport-openidconnect').Strategy;
+  
+  // ... (your existing Passport setup)
+  
+  app.use(passport.initialize());
+  app.use(passport.session());
+  
   function ensureAuthenticated(req, res, next) {
-    if (process.env.NODE_ENV === 'development') {
-      // Simulate a logged-in user
-      req.user = { name: 'Dev User', email: 'dev@example.com' };
-      return next();
-    }
-  
     if (req.isAuthenticated()) {
       return next();
     }
     res.redirect('/login');
   }
+  
+  // OneLogin routes
+  app.get('/login', passport.authenticate('openidconnect', {
+    successReturnToOrRedirect: '/faculty',
+    scope: 'profile'
+  }));
+  
+  app.get('/oauth/callback', 
+    passport.authenticate('openidconnect', { failureRedirect: '/login' }),
+    (req, res) => {
+      req.session.accessToken = req.authInfo.access_token;
+      req.session.idToken = req.query.id_token;
+      res.redirect('/faculty');
+    }
+  );
+  
+  app.get('/logout', (req, res) => {
+    req.logout(() => {
+      res.redirect('/login');
+    });
+  });
+}
+
+
 
 function addresses(ids){
   var email = "";
