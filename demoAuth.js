@@ -1,8 +1,27 @@
 // demoAuth.js - DEMO ONLY - Remove before production
 
 const demoCredentials = [
-  { username: 'demo', password: 'demo123', name: 'Demo Faculty', email: 'demo@carthage.edu' },
-  { username: 'faculty1', password: 'pass123', name: 'Dr. Smith', email: 'smith@carthage.edu' },
+  { 
+    username: 'admin', 
+    password: 'admin123', 
+    name: 'Admin User', 
+    email: 'admin@carthage.edu',
+    role: 'admin' 
+  },
+  { 
+    username: 'faculty', 
+    password: 'faculty123', 
+    name: 'Dr. Smith', 
+    email: 'smith@carthage.edu',
+    role: 'faculty'
+  },
+  { 
+    username: 'viewer', 
+    password: 'viewer123', 
+    name: 'Jane Doe', 
+    email: 'doe@carthage.edu',
+    role: 'viewer'
+  },
 ];
 
 function setupDemoAuth(app) {
@@ -18,7 +37,7 @@ function setupDemoAuth(app) {
     const user = demoCredentials.find(u => u.username === username && u.password === password);
     
     if (user) {
-      req.session.demoUser = { name: user.name, email: user.email };
+      req.session.demoUser = { name: user.name, email: user.email, role: user.role };
       return res.redirect('/faculty');
     }
     

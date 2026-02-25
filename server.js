@@ -51,6 +51,12 @@ const router = express.Router();
 
 const USE_DEMO_AUTH = true; //TO DO - set false before production
 
+const ROLES = {
+  VIEWER: 'viewer',
+  FACULTY: 'faculty',
+  ADMIN: 'admin'
+};
+
 const app = express(); 
 //let transporter = nodemailer.createTransport(options[, defaults])
 const handlebars = require('express-handlebars').create({defaultLayout: 'main'});
@@ -96,12 +102,22 @@ passport.use(new OneLoginStrategy({
     return cb(null, profile);
   }));
 
-  passport.serializeUser((user, done) => done(null, user));
-  passport.deserializeUser((obj, done) => done(null, obj));
-  
-  // Initialize Passport middleware
-  app.use(passport.initialize());
-  app.use(passport.session());
+passport.serializeUser((user, done) => done(null, user));
+passport.deserializeUser((obj, done) => done(null, obj));
+
+// Initialize Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Middleware to check roles
+function requireRole(allowedRoles){
+  return function(req, res, next){
+    if(!req.user || !allowedRoles.includes(req.user.role)){
+      return res.status(403).send('Access denied');
+    }
+    next();
+  };
+}
 
 // ─────────────────────────────────────────────────────────────
 //  DEMO AUTHENTICATION SETUP
@@ -465,7 +481,7 @@ app.get('/allinformation/:projectid', ensureAuthenticated, async (req, res) => {
   
 });
 
-app.post('/allinformation/statusupdate/:projectid', ensureAuthenticated, async (req, res) => {
+app.post('/allinformation/statusupdate/:projectid', ensureAuthenticated, requireRole([ROLES.FACULTY, ROLES.ADMIN]), async (req, res) => {
   try {
 	await db.updateProjectStatus(req.body.pStatus,Number(req.params.projectid));
 
@@ -475,7 +491,7 @@ app.post('/allinformation/statusupdate/:projectid', ensureAuthenticated, async (
   res.redirect('/allinformation/' + req.params.projectid);
 });
 
-app.post('/allinformation/delete/:projectid', ensureAuthenticated, async(req, res) => {
+app.post('/allinformation/delete/:projectid', ensureAuthenticated,  requireRole([ROLES.ADMIN]), async(req, res) => {
   try {
     
       // Use projectIdToDelete to delete the project from your database
@@ -492,7 +508,7 @@ app.post('/allinformation/delete/:projectid', ensureAuthenticated, async(req, re
 });
 
 //Remove Department From Project
-app.post('/allinformation/deleteDep/:projectid', ensureAuthenticated, async(req, res) => {
+app.post('/allinformation/deleteDep/:projectid', ensureAuthenticated, requireRole([ROLES.ADMIN]), async(req, res) => {
   try {
     
     const { departmentID } = req.body;
@@ -517,7 +533,7 @@ app.post('/allinformation/deleteDep/:projectid', ensureAuthenticated, async(req,
 });
 
 // Add department to project that is already created
-app.post('/allinformation/addDep/:projectid', ensureAuthenticated, async(req, res) => {
+app.post('/allinformation/addDep/:projectid', ensureAuthenticated, requireRole([ROLES.FACULTY, ROLES.ADMIN]),async(req, res) => {
   try {
     
     //var depID = db.getDepartmentID(req.params.depName);
@@ -541,7 +557,7 @@ app.post('/allinformation/addDep/:projectid', ensureAuthenticated, async(req, re
 });
 
 // Page for faculty to manually add project
-app.get('/addProject', ensureAuthenticated, (req, res) => {
+app.get('/addProject', ensureAuthenticated, requireRole([ROLES.FACULTY, ROLES.ADMIN]), (req, res) => {
   res.render('addProject'); 
 });
 
@@ -565,7 +581,9 @@ app.post('/addProject', async (req, res) => {
     pStatus,
     pNumber,
     OrgSite,
-    compDate
+    compDate,
+    radio,
+    helpAvail
   } = req.body;
 
   try {
