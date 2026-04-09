@@ -49,7 +49,7 @@ class DBAbstraction {
     insertProject(Description, pStatus, comp, radio, helpAvail, id, dateTime) 
     {
         
-        const sql = 'INSERT OR IGNORE INTO Project (Description, pstatus, TimeLine, Date, radio, helpAvail, CompanyID) VALUES (?, ?, ?, ?, ?, ?, ?);';
+        const sql = 'INSERT OR IGNORE INTO Project (Description, pstatus, endDate, createDate, radio, helpAvail, CompanyID) VALUES (?, ?, ?, ?, ?, ?, ?);';
         
         return new Promise((resolve, reject) => { 
             this.db.run(sql, [Description, pStatus, comp, dateTime, radio, helpAvail, id], (err) => {                 
@@ -117,7 +117,7 @@ class DBAbstraction {
 	getAllProjects()
 	{
     	const sql = `
-		SELECT Company.name, Company.first, Company.last, Project.Description, Project.Date, Project.pstatus, Department.depName, Project.projectID
+		SELECT Company.name, Company.first, Company.last, Project.Description, Project.createDate, Project.pstatus, Department.depName, Project.projectID
 		FROM Project, Company, Department, ProjectDepartment
 		WHERE Project.CompanyID = Company.companyID
 		AND Project.projectID = ProjectDepartment.projectID
@@ -140,7 +140,7 @@ class DBAbstraction {
 		// Start building the SQL query
 		let sql = `
 			SELECT Company.name, Company.first, Company.last,
-				Project.Description, Project.Date, Project.pstatus,
+				Project.Description, Project.createDate, Project.pstatus,
 				Department.depName, Project.projectID
 			FROM Project
 			JOIN Company ON Project.CompanyID = Company.companyID
@@ -175,15 +175,15 @@ class DBAbstraction {
 
 		// Date range filter
 		if (startDate) {
-			sql += ` AND date(substr(Project.Date, 1, 10)) >= date(?) `;
+			sql += ` AND date(substr(Project.createDate, 1, 10)) >= date(?) `;
 			params.push(startDate);
 		}
 		if (endDate) {
-			sql += ` AND date(substr(Project.Date, 1, 10)) <= date(?) `;
+			sql += ` AND date(substr(Project.createDate, 1, 10)) <= date(?) `;
 			params.push(endDate);
 		}
 
-		sql += ` GROUP BY Project.projectID ORDER BY Project.Date DESC; `;
+		sql += ` GROUP BY Project.projectID ORDER BY Project.createDate DESC; `;
 
 		return new Promise((resolve, reject) => {
 			this.db.all(sql, params, (err, rows) => {
@@ -199,7 +199,7 @@ class DBAbstraction {
 	getAllProjectsSortByCompany()
 	{
     	const sql = `
-		SELECT Company.name, Company.first, Company.last, Project.Description, Project.Date, Project.pstatus, Department.depName, Project.projectID
+		SELECT Company.name, Company.first, Company.last, Project.Description, Project.createDate, Project.pstatus, Department.depName, Project.projectID
 		FROM Project, Company, Department, ProjectDepartment
 		WHERE Project.CompanyID = Company.companyID
 		AND Project.projectID = ProjectDepartment.projectID
@@ -222,7 +222,7 @@ class DBAbstraction {
     getAllProjectsReverseSortByCompany()
 	{
     	const sql = `
-		SELECT Company.name, Company.first, Company.last, Project.Description, Project.Date, Project.pstatus, Department.depName, Project.projectID
+		SELECT Company.name, Company.first, Company.last, Project.Description, Project.createDate, Project.pstatus, Department.depName, Project.projectID
 		FROM Project, Company, Department, ProjectDepartment
 		WHERE Project.CompanyID = Company.companyID
 		AND Project.projectID = ProjectDepartment.projectID
@@ -245,7 +245,7 @@ class DBAbstraction {
 	getAllProjectsSortByDate()
 	{
     	const sql = `
-		SELECT Company.name, Company.first, Company.last, Project.Description, Project.Date, Project.pstatus, Department.depName, Project.projectID
+		SELECT Company.name, Company.first, Company.last, Project.Description, Project.createDate, Project.pstatus, Department.depName, Project.projectID
 		FROM Project, Company, Department, ProjectDepartment
 		WHERE Project.CompanyID = Company.companyID
 		AND Project.projectID = ProjectDepartment.projectID
@@ -268,7 +268,7 @@ class DBAbstraction {
     getAllProjectsReverseSortByDate()
 	{
     	const sql = `
-		SELECT Company.name, Company.first, Company.last, Project.Description, Project.Date, Project.pstatus, Department.depName, Project.projectID
+		SELECT Company.name, Company.first, Company.last, Project.Description, Project.createDate, Project.pstatus, Department.depName, Project.projectID
 		FROM Project, Company, Department, ProjectDepartment
 		WHERE Project.CompanyID = Company.companyID
 		AND Project.projectID = ProjectDepartment.projectID
@@ -291,7 +291,7 @@ class DBAbstraction {
     getAllProjectsSortByStatus()
 	{
     	const sql = `
-		SELECT Company.name, Company.first, Company.last, Project.Description, Project.Date, Project.pstatus, Department.depName, Project.projectID
+		SELECT Company.name, Company.first, Company.last, Project.Description, Project.createDate, Project.pstatus, Department.depName, Project.projectID
 		FROM Project, Company, Department, ProjectDepartment
 		WHERE Project.CompanyID = Company.companyID
 		AND Project.projectID = ProjectDepartment.projectID
@@ -315,7 +315,7 @@ class DBAbstraction {
 	getAllProjectsReverseSortByStatus()
 	{
     	const sql = `
-		SELECT Company.name, Company.first, Company.last, Project.Description, Project.Date, Project.pstatus, Department.depName, Project.projectID
+		SELECT Company.name, Company.first, Company.last, Project.Description, Project.createDate, Project.pstatus, Department.depName, Project.projectID
 		FROM Project, Company, Department, ProjectDepartment
 		WHERE Project.CompanyID = Company.companyID
 		AND Project.projectID = ProjectDepartment.projectID
@@ -340,7 +340,7 @@ class DBAbstraction {
 	getAllProjectsSortByDepartment()
 	{
     	const sql = `
-		SELECT Company.name, Company.first, Company.last, Project.Description, Project.Date, Project.pstatus, Department.depName, Project.projectID
+		SELECT Company.name, Company.first, Company.last, Project.Description, Project.createDate, Project.pstatus, Department.depName, Project.projectID
 		FROM Project, Company, Department, ProjectDepartment
 		WHERE Project.CompanyID = Company.companyID
 		AND Project.projectID = ProjectDepartment.projectID
@@ -363,7 +363,7 @@ class DBAbstraction {
     getAllProjectsReverseSortByDepartment()
 	{
     	const sql = `
-		SELECT Company.name, Company.first, Company.last, Project.Description, Project.Date, Project.pstatus, Department.depName, Project.projectID
+		SELECT Company.name, Company.first, Company.last, Project.Description, Project.createDate, Project.pstatus, Department.depName, Project.projectID
 		FROM Project, Company, Department, ProjectDepartment
 		WHERE Project.CompanyID = Company.companyID
 		AND Project.projectID = ProjectDepartment.projectID
@@ -390,7 +390,7 @@ class DBAbstraction {
         }
 		 
     	const sql = `
-		SELECT Project.projectID, Project.Description, Project.pstatus, Project.TimeLine, Project.Date, Project.radio, Project.helpAvail, Company.name, Company.street, Company.city, Company.state, Company.zip, Company.first, Company.last, Company.phone, Company.email, Company.companyWeb, Department.depName, Department.head, Department.depEmail, Department.departmentID
+		SELECT Project.projectID, Project.Description, Project.pstatus, Project.endDate, Project.createDate, Project.radio, Project.helpAvail, Company.name, Company.street, Company.city, Company.state, Company.zip, Company.first, Company.last, Company.phone, Company.email, Company.companyWeb, Department.depName, Department.head, Department.depEmail, Department.departmentID
 		FROM Project, Company, Department, ProjectDepartment
 		WHERE Project.CompanyID = Company.companyID 
 		AND Project.projectID = ?
@@ -780,7 +780,7 @@ deleteUnusedCompany()
 	getProjectByStatus(status)
 	{
 		const sql = `
-			SELECT Company.name, Company.first, Company.last, Project.Description, Project.Date, Project.pstatus, Department.depName, Project.projectID
+			SELECT Company.name, Company.first, Company.last, Project.Description, Project.createDate, Project.pstatus, Department.depName, Project.projectID
         FROM Project
         JOIN Company ON Project.CompanyID = Company.companyID
         JOIN ProjectDepartment ON Project.projectID = ProjectDepartment.projectID

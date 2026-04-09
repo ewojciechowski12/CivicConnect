@@ -307,6 +307,7 @@ app.post('/project', async (req, res) => {
     const radio = req.body.radio;
     const OrgName = req.body.OrgName;
     const compDate = req.body.compDate;
+    const startDate = req.body.startdate;
     const streetAddr = req.body.streetAddr;
     const zip = req.body.zip;
     const helpAvail = req.body.helpAvail;
@@ -324,7 +325,7 @@ app.post('/project', async (req, res) => {
       var now = new Date();
       var dateTime = now.toISOString().slice(0,19).replace('T',' ');
 
-      await db.insertProject(Description, pStatus, compDate, radio, helpAvail, companyID, dateTime);
+      await db.insertProject(Description, pStatus, compDate, startDate, radio, helpAvail, companyID, dateTime);
 
       const projectID = await db.getProjectID(Description);
       if (!projectID) {
@@ -582,6 +583,7 @@ app.post('/addProject', async (req, res) => {
     pNumber,
     OrgSite,
     compDate,
+    startDate,
     radio,
     helpAvail
   } = req.body;
@@ -600,7 +602,7 @@ app.post('/addProject', async (req, res) => {
     const dateTime = `${currentDate.getFullYear()} / ${currentDate.getMonth() + 1} / ${currentDate.getDate()} @ ${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}`;
 
     // Insert new project
-    await db.insertProject(Description, pStatus, compDate, radio, helpAvail, companyID, dateTime);
+    await db.insertProject(Description, pStatus, compDate, startDate, radio, helpAvail, companyID, dateTime);
     const projectID = await db.getProjectID(Description);
 
     if (!projectID) {
