@@ -306,8 +306,8 @@ app.post('/project', async (req, res) => {
     const state = req.body.state;
     const radio = req.body.radio;
     const OrgName = req.body.OrgName;
-    const compDate = req.body.compDate;
-    const startDate = req.body.startdate;
+    const endDate = req.body.endDate;
+    const startDate = req.body.startDate;
     const streetAddr = req.body.streetAddr;
     const zip = req.body.zip;
     const helpAvail = req.body.helpAvail;
@@ -323,9 +323,9 @@ app.post('/project', async (req, res) => {
       }
 
       var now = new Date();
-      var dateTime = now.toISOString().slice(0,19).replace('T',' ');
+      var createDate = now.toISOString().slice(0,19).replace('T',' ');
 
-      await db.insertProject(Description, pStatus, compDate, startDate, radio, helpAvail, companyID, dateTime);
+      await db.insertProject(Description, pStatus, endDate, createDate, radio, helpAvail, companyID, startDate);
 
       const projectID = await db.getProjectID(Description);
       if (!projectID) {
@@ -582,7 +582,7 @@ app.post('/addProject', async (req, res) => {
     pStatus,
     pNumber,
     OrgSite,
-    compDate,
+    endDate,
     startDate,
     radio,
     helpAvail
@@ -599,10 +599,10 @@ app.post('/addProject', async (req, res) => {
 
     // Get current date/time
     const currentDate = new Date();
-    const dateTime = `${currentDate.getFullYear()} / ${currentDate.getMonth() + 1} / ${currentDate.getDate()} @ ${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}`;
+    const createDate = `${currentDate.getFullYear()} / ${currentDate.getMonth() + 1} / ${currentDate.getDate()} @ ${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}`;
 
     // Insert new project
-    await db.insertProject(Description, pStatus, compDate, startDate, radio, helpAvail, companyID, dateTime);
+    await db.insertProject(Description, pStatus, endDate, startDate, radio, helpAvail, createDate, companyID);
     const projectID = await db.getProjectID(Description);
 
     if (!projectID) {

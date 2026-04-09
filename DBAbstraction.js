@@ -46,13 +46,13 @@ class DBAbstraction {
         });
     }
 
-    insertProject(Description, pStatus, comp, radio, helpAvail, id, dateTime) 
+   insertProject(Description, pStatus, endDate, createDate, radio, helpAvail, id, startDate) 
     {
         
-        const sql = 'INSERT OR IGNORE INTO Project (Description, pstatus, endDate, createDate, radio, helpAvail, CompanyID) VALUES (?, ?, ?, ?, ?, ?, ?);';
+        const sql = 'INSERT OR IGNORE INTO Project (Description, pstatus, endDate, createDate, radio, helpAvail, CompanyID, startDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?);';
         
         return new Promise((resolve, reject) => { 
-            this.db.run(sql, [Description, pStatus, comp, dateTime, radio, helpAvail, id], (err) => {                 
+            this.db.run(sql, [Description, pStatus, endDate, createDate, radio, helpAvail, id, startDate], (err) => {                 
                 if(err) { 
                     reject(err); 
                 } else { 
@@ -390,7 +390,7 @@ class DBAbstraction {
         }
 		 
     	const sql = `
-		SELECT Project.projectID, Project.Description, Project.pstatus, Project.endDate, Project.createDate, Project.radio, Project.helpAvail, Company.name, Company.street, Company.city, Company.state, Company.zip, Company.first, Company.last, Company.phone, Company.email, Company.companyWeb, Department.depName, Department.head, Department.depEmail, Department.departmentID
+		SELECT Project.projectID, Project.Description, Project.pstatus, Project.endDate, Project.startDate, Project.createDate, Project.radio, Project.helpAvail, Company.name, Company.street, Company.city, Company.state, Company.zip, Company.first, Company.last, Company.phone, Company.email, Company.companyWeb, Department.depName, Department.head, Department.depEmail, Department.departmentID
 		FROM Project, Company, Department, ProjectDepartment
 		WHERE Project.CompanyID = Company.companyID 
 		AND Project.projectID = ?
