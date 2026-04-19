@@ -304,13 +304,11 @@ app.post('/project', async (req, res) => {
     const OrgSite = req.body.OrgSite;
     const pNumber = req.body.pNumber;
     const state = req.body.state;
-    const radio = req.body.radio;
     const OrgName = req.body.OrgName;
     const endDate = req.body.endDate;
     const startDate = req.body.startDate;
     const streetAddr = req.body.streetAddr;
     const zip = req.body.zip;
-    const helpAvail = req.body.helpAvail;
     const Description = req.body.Description;
     const depart = req.body.department;
     const pStatus = req.body.pStatus || "Waiting"; // default to "Waiting" if not provided
@@ -325,7 +323,7 @@ app.post('/project', async (req, res) => {
       var now = new Date();
       var createDate = now.toISOString().slice(0,19).replace('T',' ');
 
-      await db.insertProject(Description, pStatus, endDate, createDate, radio, helpAvail, companyID, startDate);
+      await db.insertProject(Description, pStatus, endDate, createDate, companyID, startDate);
 
       const projectID = await db.getProjectID(Description);
       if (!projectID) {
@@ -583,9 +581,7 @@ app.post('/addProject', async (req, res) => {
     pNumber,
     OrgSite,
     endDate,
-    startDate,
-    radio,
-    helpAvail
+    startDate
   } = req.body;
 
   try {
@@ -602,7 +598,7 @@ app.post('/addProject', async (req, res) => {
     const createDate = `${currentDate.getFullYear()} / ${currentDate.getMonth() + 1} / ${currentDate.getDate()} @ ${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}`;
 
     // Insert new project
-    await db.insertProject(Description, pStatus, endDate, startDate, radio, helpAvail, createDate, companyID);
+    await db.insertProject(Description, pStatus, endDate, startDate,createDate, companyID);
     const projectID = await db.getProjectID(Description);
 
     if (!projectID) {
