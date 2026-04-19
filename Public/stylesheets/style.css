@@ -705,3 +705,14 @@ select {
     border-radius: 4px;     
     margin-right: 8px;      
 }
+
+.form-intro {
+  background: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px 25px;
+  margin-bottom: 20px;
+  font-size: 18px;
+  line-height: 1.6;
+  color: #333;
+}
