@@ -9,11 +9,11 @@ const demoCredentials = [
     role: 'admin' 
   },
   { 
-    username: 'faculty', 
-    password: 'faculty123', 
+    username: 'editor', 
+    password: 'editor123', 
     name: 'Dr. Smith', 
     email: 'smith@carthage.edu',
-    role: 'faculty'
+    role: 'editor'
   },
   { 
     username: 'viewer', 

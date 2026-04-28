@@ -46,7 +46,7 @@ const USE_DEMO_AUTH = true; //TO DO - set false before production
 
 const ROLES = {
   VIEWER: 'viewer',
-  FACULTY: 'faculty',
+  EDITOR: 'editor',
   ADMIN: 'admin'
 };
 
@@ -483,7 +483,7 @@ app.get('/allinformation/:projectid', ensureAuthenticated, async (req, res) => {
   
 });
 
-app.post('/allinformation/statusupdate/:projectid', ensureAuthenticated, requireRole([ROLES.FACULTY, ROLES.ADMIN]), async (req, res) => {
+app.post('/allinformation/statusupdate/:projectid', ensureAuthenticated, requireRole([ROLES.EDITOR, ROLES.ADMIN]), async (req, res) => {
   try {
 	await db.updateProjectStatus(req.body.pStatus,Number(req.params.projectid));
 
@@ -535,7 +535,7 @@ app.post('/allinformation/deleteDep/:projectid', ensureAuthenticated, requireRol
 });
 
 // Add department to project that is already created
-app.post('/allinformation/addDep/:projectid', ensureAuthenticated, requireRole([ROLES.FACULTY, ROLES.ADMIN]),async(req, res) => {
+app.post('/allinformation/addDep/:projectid', ensureAuthenticated, requireRole([ROLES.EDITOR, ROLES.ADMIN]),async(req, res) => {
   try {
     
     //var depID = db.getDepartmentID(req.params.depName);
@@ -559,7 +559,7 @@ app.post('/allinformation/addDep/:projectid', ensureAuthenticated, requireRole([
 });
 
 // Page for faculty to manually add project
-app.get('/addProject', ensureAuthenticated, requireRole([ROLES.FACULTY, ROLES.ADMIN]), (req, res) => {
+app.get('/addProject', ensureAuthenticated, requireRole([ROLES.EDITOR, ROLES.ADMIN]), (req, res) => {
   res.render('addProject'); 
 });
 
