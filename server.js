@@ -14,13 +14,6 @@ var emailAddresses= [/*1*/"adassow@carthage.edu", /*2*/"nscharnick@carthage.edu"
   /*5*/"rnagel@carthage.edu",/*6*/"srubinfeld@carthage.edu", /*7*/"wsun@carthage.edu", /*8*/"jmast@carthage.edu", /*9*/"lhuaracha@carthage.edu", 
   /*10*/"ljensen@carthage.edu", /*11*/"smitchell@carthage.edu",/*12*/"jtenuta@carthage.edu", /*13*/"fig23_civic_engagement@carthage.edu" , 
   /*14*/"cpalmer5@carthage.edu", /*15*/"rmatthews@carthage.edu"]
-
-// user is the email that is controlling the account of which all automated emails will be sent from.
-var USER = 'ewojciechowski@carthage.edu'; //  fig23_civic_engagement@carthage.edu is an available email to be used for the account.
-
-// to generate the password for the account go to myaccount.google.com >> Security >> 2-Step Verification (account must have 2-Step verification enabled.)
-// then open App Passwords at the bottom of the page and name the application. copy the generated password and past in the space below.
-var PASS = 'vdnf vheb bwxz tbgm'; 
  
 
 /*####################################################################################################################################
@@ -174,7 +167,7 @@ if (USE_DEMO_AUTH) {
 }
 
 
-
+// Function to map ids of departments from project submission to ids of hardcoded emails
 function addresses(ids){
   var email = "";
   if(ids && ids.length > 0){
@@ -187,6 +180,14 @@ function addresses(ids){
   }
   return email;
 }
+
+
+// user is the email that is controlling the account of which all automated emails will be sent from.
+var USER = process.env.SMTP_EMAIL; //  fig23_civic_engagement@carthage.edu is an available email to be used for the account.
+
+// to generate the password for the account go to myaccount.google.com >> Security >> 2-Step Verification (account must have 2-Step verification enabled.)
+// then open App Passwords at the bottom of the page and name the application. copy the generated password and past in the space below.
+var PASS = process.env.SMTP_PASS; 
 
 async function mailer(bodyParser) {
   // email body setup using HTML tags.
@@ -231,7 +232,9 @@ async function mailer(bodyParser) {
 
       //  Switch the commented and uncommented lines below when ready to launch or change the to emails for testing. 
       to: 'ewojciechowski@carthage.edu', // list of receivers
-      // to: emails,
+
+      // include aspire in every email
+      //to: emails + (emails ? ', ' : '') + 'aspire@carthage.edu',
 
       // email subject line can be changed here.
       subject: 'Civic Connect Request',
